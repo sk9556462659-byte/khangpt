@@ -2,41 +2,136 @@
 <html>
 <head>
 <title>KhanGPT AI Video Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body{
-background:black;
+margin:0;
+font-family:Arial, sans-serif;
+background:linear-gradient(135deg,#000000,#111111);
 color:white;
 text-align:center;
-font-family:sans-serif;
-padding-top:100px;
 }
-input{
-width:80%;
-padding:10px;
+
+.logo{
+font-size:40px;
+margin-top:40px;
+font-weight:bold;
+}
+
+.silver{
+background:linear-gradient(to right,#cccccc,#eeeeee,#aaaaaa);
+-webkit-background-clip:text;
+color:transparent;
+}
+
+.gold{
+background:linear-gradient(to right,#d4af37,#ffd700,#b8860b);
+-webkit-background-clip:text;
+color:transparent;
+}
+
+.tagline{
 margin:10px;
+font-size:16px;
+color:#aaa;
 }
+
+.container{
+margin-top:40px;
+padding:20px;
+}
+
+input{
+width:90%;
+padding:15px;
+border-radius:8px;
+border:none;
+margin-bottom:15px;
+font-size:16px;
+}
+
+select{
+width:95%;
+padding:12px;
+border-radius:8px;
+border:none;
+margin-bottom:15px;
+}
+
 button{
-padding:10px 20px;
+padding:15px 30px;
 background:gold;
 border:none;
+border-radius:8px;
+font-size:16px;
 cursor:pointer;
+font-weight:bold;
+}
+
+.plan{
+margin-top:50px;
+padding:20px;
+background:#111;
+border-radius:12px;
+width:90%;
+margin-left:auto;
+margin-right:auto;
+}
+
+.footer{
+margin-top:40px;
+padding:20px;
+color:#777;
+font-size:14px;
 }
 </style>
 </head>
+
 <body>
 
-<h1>🎬 KhanGPT</h1>
-<p>High Quality AI Video Generator</p>
+<div class="logo">
+<span class="silver">Khan</span><span class="gold">GPT</span>
+</div>
 
-<input type="text" id="prompt" placeholder="Enter your video prompt">
+<div class="tagline">
+Create Stunning 2D & 3D AI Videos from Prompt
+</div>
 
-<button onclick="goToPika()">Generate Video</button>
+<div class="container">
 
-<script>
-function goToPika(){
-window.location.href = "https://pika.art";
-}
-</script>
+<input type="text" placeholder="Enter your video prompt here...">
+
+<select>
+<option>Select Style</option>
+<option>2D Animation</option>
+<option>3D Animation</option>
+<option>Cinematic AI</option>
+</select>
+
+<button onclick="alert('AI System Coming Soon')">
+Generate Video
+</button>
+
+</div>
+
+<div class="plan">
+<h3>Free Plan</h3>
+<p>✔ Limited Video Generation</p>
+<p>✔ Watermark Included</p>
+
+<hr style="margin:20px 0; border:1px solid #222;">
+
+<h3>Premium Plan</h3>
+<p>✔ Unlimited Videos</p>
+<p>✔ No Watermark</p>
+<p>✔ Fast Rendering</p>
+<p style="color:gold;">Upgrade Coming Soon</p>
+</div>
+
+<div class="footer">
+© 2026 KhanGPT - AI Video Platform
+</div>
 
 </body>
 </html>
