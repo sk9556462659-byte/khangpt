@@ -42,9 +42,17 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Invalid prompt" });
   }
 
-  // Basic prompt length limit
   if (prompt.length > 500) {
     return res.status(400).json({ error: "Prompt too long" });
+  }
+
+  const FAL_KEY = process.env.FAL_KEY;
+
+  // ===== If No API Key → Demo Mode =====
+  if (!FAL_KEY) {
+    return res.status(200).json({
+      url: "https://images.unsplash.com/photo-1682686580391-615b8b8e0f4c"
+    });
   }
 
   try {
@@ -52,7 +60,7 @@ export default async function handler(req, res) {
     const response = await fetch("https://fal.run/fal-ai/fast-sdxl", {
       method: "POST",
       headers: {
-        "Authorization": `Key ${process.env.FAL_KEY}`,
+        "Authorization": `Key ${FAL_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -65,6 +73,7 @@ export default async function handler(req, res) {
 
     console.log("FAL Response:", data);
 
+    // Real success
     if (data.images && data.images[0]?.url) {
       return res.status(200).json({ url: data.images[0].url });
     }
@@ -73,10 +82,17 @@ export default async function handler(req, res) {
       return res.status(200).json({ url: data.output[0].url });
     }
 
-    return res.status(500).json({ error: "Generation failed" });
+    // If API error or balance exhausted → Demo fallback
+    return res.status(200).json({
+      url: "https://images.unsplash.com/photo-1682686580391-615b8b8e0f4c"
+    });
 
   } catch (error) {
     console.error("Server error:", error);
-    return res.status(500).json({ error: "Server error" });
+
+    // Any crash → Demo fallback
+    return res.status(200).json({
+      url: "https://images.unsplash.com/photo-1682686580391-615b8b8e0f4c"
+    });
   }
 }
