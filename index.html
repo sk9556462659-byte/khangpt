@@ -1,35 +1,40 @@
 <script>
-async function generateVideo(){
+async function generateVideo() {
 
-var prompt = document.getElementById("prompt").value;
+  const prompt = document.getElementById("prompt").value;
 
-if(prompt === ""){
-alert("Please enter a prompt first");
-return;
-}
+  if (!prompt) {
+    alert("Please enter a prompt first");
+    return;
+  }
 
-try{
+  try {
 
-const response = await fetch("/api/generate", {
-method: "POST",
-headers: {
-"Content-Type": "application/json"
-},
-body: JSON.stringify({ prompt: prompt })
-});
+    const response = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ prompt })
+    });
 
-const data = await response.json();
+    const data = await response.json();
 
-if(data.url){
-window.open(data.url, "_blank");
-}
-else{
-alert(data.error || "Something went wrong");
-}
+    if (data.image) {
+      // Image show on same page
+      const img = document.createElement("img");
+      img.src = data.image;
+      img.style.maxWidth = "100%";
+      img.style.marginTop = "20px";
+      document.body.appendChild(img);
+    } 
+    else {
+      alert(data.error || "Generation failed");
+    }
 
-}catch(error){
-alert("Server error");
-}
+  } catch (error) {
+    alert("Server error");
+  }
 
 }
 </script>
