@@ -19,30 +19,28 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        prompt: prompt
+        prompt: prompt,
+        image_size: "square_hd"
       })
     });
 
     const data = await response.json();
 
-    // 🔥 Debug (optional but useful)
     console.log("FAL Response:", data);
 
-    if (data.images && data.images.length > 0) {
-      return res.status(200).json({
-        image: data.images[0].url
-      });
+    // FIXED RESPONSE HANDLING
+    if (data.images && data.images[0] && data.images[0].url) {
+      return res.status(200).json({ url: data.images[0].url });
     }
 
-    return res.status(500).json({
-      error: "No image generated"
-    });
+    if (data.output && data.output[0] && data.output[0].url) {
+      return res.status(200).json({ url: data.output[0].url });
+    }
+
+    return res.status(500).json({ error: JSON.stringify(data) });
 
   } catch (error) {
-    console.error("Server error:", error);
-    return res.status(500).json({
-      error: "Server error"
-    });
+    return res.status(500).json({ error: error.message });
   }
 
 }
