@@ -1,161 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>KhanGPT AI Video Generator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body{
-margin:0;
-font-family:Arial, sans-serif;
-background:linear-gradient(135deg,#000000,#111111,#1a1a1a);
-color:white;
-text-align:center;
-}
-
-.container{
-padding:40px 20px;
-}
-
-.logo{
-font-size:48px;
-font-weight:bold;
-margin-top:40px;
-}
-
-.logo span{
-color:gold;
-}
-
-.tagline{
-margin-top:10px;
-font-size:18px;
-color:#cccccc;
-}
-
-.card{
-background:rgba(255,255,255,0.05);
-backdrop-filter:blur(10px);
-border-radius:20px;
-padding:30px;
-margin:30px auto;
-max-width:400px;
-box-shadow:0 0 25px rgba(255,215,0,0.2);
-}
-
-input, select{
-width:100%;
-padding:15px;
-margin:10px 0;
-border:none;
-border-radius:12px;
-font-size:16px;
-}
-
-button{
-width:100%;
-padding:15px;
-margin-top:15px;
-background:gold;
-border:none;
-border-radius:12px;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
-transition:0.3s;
-}
-
-button:hover{
-background:#ffcc00;
-transform:scale(1.05);
-}
-
-.plan{
-margin-top:40px;
-}
-
-.plan h2{
-margin-bottom:10px;
-}
-
-.footer{
-margin-top:50px;
-padding:20px;
-font-size:14px;
-color:#888;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<div class="logo">Khan<span>GPT</span></div>
-<div class="tagline">Create Stunning 2D & 3D AI Videos from Prompt</div>
-
-<div class="card">
-
-<input type="text" id="prompt" placeholder="Enter your video prompt here...">
-
-<select id="style">
-<option value="">Select Style</option>
-<option value="2D">2D Animation</option>
-<option value="3D">3D Animation</option>
-<option value="Cinematic">Cinematic AI</option>
-</select>
-
-<button onclick="generateVideo()">Generate Video</button>
-
-</div>
-
-<div class="plan">
-<h2>Free Plan</h2>
-<p>✔ Limited Video Generation</p>
-<p>✔ Watermark Included</p>
-
-<h2 style="margin-top:30px;">Premium Plan</h2>
-<p>✔ Unlimited Videos</p>
-<p>✔ No Watermark</p>
-<p>✔ Faster Rendering</p>
-</div>
-
-<div class="footer">
-© 2026 KhanGPT. All Rights Reserved.
-</div>
-
-</div>
-
 <script>
-function generateVideo(){
+async function generateVideo(){
 
 var prompt = document.getElementById("prompt").value;
-var style = document.getElementById("style").value;
 
 if(prompt === ""){
 alert("Please enter a prompt first");
 return;
 }
 
-if(style === ""){
-alert("Please select a style");
-return;
+try{
+
+const response = await fetch("/api/generate", {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({ prompt: prompt })
+});
+
+const data = await response.json();
+
+if(data.url){
+window.open(data.url, "_blank");
+}
+else{
+alert(data.error || "Something went wrong");
 }
 
-if(style === "2D"){
-window.location.href = "https://pika.art";
-}
-
-else if(style === "3D"){
-window.location.href = "https://runwayml.com";
-}
-
-else if(style === "Cinematic"){
-window.location.href = "https://kaiber.ai";
+}catch(error){
+alert("Server error");
 }
 
 }
 </script>
-
-</body>
-</html>
