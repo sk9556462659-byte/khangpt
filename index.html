@@ -1,5 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>KhanGPT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding: 40px;
+    }
+
+    input {
+      width: 80%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: none;
+    }
+
+    button {
+      padding: 12px 20px;
+      background: gold;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    img {
+      margin-top: 20px;
+      max-width: 100%;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>KhanGPT</h1>
+  <p>Create AI Images</p>
+
+  <input type="text" id="prompt" placeholder="Enter your prompt here..." />
+  <br>
+  <button onclick="generateImage()">Generate</button>
+
+  <div id="result"></div>
+
 <script>
-async function generateVideo() {
+async function generateImage() {
 
   const prompt = document.getElementById("prompt").value;
 
@@ -21,14 +71,9 @@ async function generateVideo() {
     const data = await response.json();
 
     if (data.image) {
-      // Image show on same page
-      const img = document.createElement("img");
-      img.src = data.image;
-      img.style.maxWidth = "100%";
-      img.style.marginTop = "20px";
-      document.body.appendChild(img);
-    } 
-    else {
+      document.getElementById("result").innerHTML =
+        `<img src="${data.image}" />`;
+    } else {
       alert(data.error || "Generation failed");
     }
 
@@ -38,3 +83,6 @@ async function generateVideo() {
 
 }
 </script>
+
+</body>
+</html>
