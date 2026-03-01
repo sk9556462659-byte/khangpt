@@ -5,58 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      background: #111;
+      background: #0f0f0f;
       color: white;
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding: 40px;
+      padding: 30px;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 5px;
     }
 
     input {
       width: 80%;
       padding: 12px;
-      margin: 10px 0;
-      border-radius: 6px;
+      border-radius: 8px;
       border: none;
+      margin-top: 20px;
+      font-size: 16px;
     }
 
     button {
-      padding: 12px 20px;
+      margin-top: 15px;
+      padding: 12px 25px;
       background: gold;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:disabled {
+      background: gray;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      margin-top: 15px;
+      display: none;
     }
 
     img {
       margin-top: 20px;
       max-width: 100%;
+      border-radius: 12px;
+    }
+
+    .gallery {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .gallery img {
+      width: 100%;
       border-radius: 10px;
     }
+
   </style>
 </head>
 
 <body>
 
-  <h1>KhanGPT</h1>
-  <p>Create AI Images</p>
+<h1>KhanGPT</h1>
+<p>Create AI Images</p>
 
-  <input type="text" id="prompt" placeholder="Enter your prompt here..." />
-  <br>
-  <button onclick="generateImage()">Generate</button>
+<input type="text" id="prompt" placeholder="Enter your prompt..." />
+<br>
+<button id="generateBtn" onclick="generateImage()">Generate</button>
 
-  <div id="result"></div>
+<div class="spinner" id="loading">⏳ Generating...</div>
+
+<div id="result"></div>
+
+<h3 style="margin-top:40px;">History</h3>
+<div class="gallery" id="gallery"></div>
 
 <script>
+
+let historyImages = [];
+
 async function generateImage() {
 
   const prompt = document.getElementById("prompt").value;
+  const btn = document.getElementById("generateBtn");
+  const loading = document.getElementById("loading");
 
   if (!prompt) {
-    alert("Please enter a prompt first");
+    alert("Enter prompt first");
     return;
   }
+
+  btn.disabled = true;
+  loading.style.display = "block";
 
   try {
 
@@ -71,8 +115,17 @@ async function generateImage() {
     const data = await response.json();
 
     if (data.image) {
+
       document.getElementById("result").innerHTML =
-        `<img src="${data.image}" />`;
+        `<img src="${data.image}" />
+         <br>
+         <a href="${data.image}" download>
+           <button>Download</button>
+         </a>`;
+
+      historyImages.unshift(data.image);
+      updateGallery();
+
     } else {
       alert(data.error || "Generation failed");
     }
@@ -81,7 +134,18 @@ async function generateImage() {
     alert("Server error");
   }
 
+  btn.disabled = false;
+  loading.style.display = "none";
 }
+
+function updateGallery() {
+  const gallery = document.getElementById("gallery");
+  gallery.innerHTML = historyImages
+    .slice(0, 6)
+    .map(img => `<img src="${img}" />`)
+    .join("");
+}
+
 </script>
 
 </body>
