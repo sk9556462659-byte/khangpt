@@ -25,14 +25,24 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
+    // 🔥 Debug (optional but useful)
+    console.log("FAL Response:", data);
+
     if (data.images && data.images.length > 0) {
-      return res.status(200).json({ url: data.images[0].url });
+      return res.status(200).json({
+        image: data.images[0].url
+      });
     }
 
-    return res.status(500).json({ error: "No image generated" });
+    return res.status(500).json({
+      error: "No image generated"
+    });
 
   } catch (error) {
-    return res.status(500).json({ error: "Server error" });
+    console.error("Server error:", error);
+    return res.status(500).json({
+      error: "Server error"
+    });
   }
 
 }
