@@ -104,7 +104,6 @@ margin-top:10px;
 <div id="result"></div>
 </div>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
@@ -118,32 +117,28 @@ const firebaseConfig = {
   appId: "1:317363736581:web:cf95d06102c5b056290c6c"
 };
 
-/* Prevent double initialize */
 if (!firebase.apps.length) {
 firebase.initializeApp(firebaseConfig);
 }
 
 const auth = firebase.auth();
-
-/* Enable persistence */
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 let currentUser = null;
 const MAX_FREE = 2;
 
-/* Handle redirect result */
+/* 🔥 FIXED REDIRECT HANDLER */
 auth.getRedirectResult()
 .then((result) => {
 if (result.user) {
-console.log("Login success");
-window.location.href = window.location.origin;
+window.location.replace("https://khangpt.vercel.app");
 }
 })
 .catch((error) => {
 console.error("Redirect error:", error);
 });
 
-/* Auth state */
+/* Auth State */
 auth.onAuthStateChanged((user) => {
 if (user) {
 currentUser = user;
@@ -159,12 +154,13 @@ document.getElementById("logoutBtn").style.display = "none";
 updateUsage();
 });
 
-/* Button Events */
+/* Login */
 document.getElementById("loginBtn").addEventListener("click", () => {
 const provider = new firebase.auth.GoogleAuthProvider();
 auth.signInWithRedirect(provider);
 });
 
+/* Logout */
 document.getElementById("logoutBtn").addEventListener("click", () => {
 auth.signOut().then(() => {
 window.location.reload();
@@ -173,7 +169,6 @@ window.location.reload();
 
 document.getElementById("generateBtn").addEventListener("click", generateImage);
 
-/* Usage System */
 function usageKey(){
 if(!currentUser) return "guest_usage";
 return "usage_"+currentUser.uid+"_"+new Date().toISOString().split('T')[0];
