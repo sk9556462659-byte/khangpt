@@ -1,27 +1,5 @@
 const rateLimitMap = new Map();
 
-const MODELS = {
-  fal: {
-    endpoint: "https://fal.run/fal-ai/fast-sdxl"
-  }
-};
-
-function success(res, payload) {
-  return res.status(200).json({
-    success: true,
-    data: payload,
-    error: null
-  });
-}
-
-function fail(res, message, code = 400) {
-  return res.status(code).json({
-    success: false,
-    data: null,
-    error: message
-  });
-}
-
 function isRateLimited(ip) {
   const now = Date.now();
   const windowMs = 10 * 60 * 1000;
@@ -41,7 +19,7 @@ function isRateLimited(ip) {
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
-    return fail(res, "Method not allowed", 405);
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const ip =
@@ -50,33 +28,30 @@ export default async function handler(req, res) {
     "unknown";
 
   if (isRateLimited(ip)) {
-    return fail(res, "Too many requests. Wait 10 minutes.", 429);
+    return res.status(429).json({
+      error: "Too many requests. Please wait 10 minutes."
+    });
   }
 
-  const { prompt, model = "fal" } = req.body;
+  const { prompt } = req.body;
 
   if (!prompt || typeof prompt !== "string") {
-    return fail(res, "Invalid prompt");
-  }
-
-  if (prompt.length > 500) {
-    return fail(res, "Prompt too long (max 500 characters)");
+    return res.status(400).json({ error: "Invalid prompt" });
   }
 
   const FAL_KEY = process.env.FAL_KEY;
-  const demoImage =
-    "https://images.unsplash.com/photo-1682686580391-615b8b8e0f4c";
+  const demoImage = "https://picsum.photos/1024";
 
   if (!FAL_KEY) {
-    return success(res, { imageUrl: demoImage });
+    return res.status(200).json({ url: demoImage });
   }
 
   try {
 
-    const response = await fetch(MODELS[model].endpoint, {
+    const response = await fetch("https://fal.run/fal-ai/fast-sdxl", {
       method: "POST",
       headers: {
-        Authorization: `Key ${FAL_KEY}`,
+        "Authorization": `Key ${FAL_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -86,19 +61,22 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      return success(res, { imageUrl: demoImage });
+      return res.status(200).json({ url: demoImage });
     }
 
     const data = await response.json();
 
-    const imageUrl =
-      data?.images?.[0]?.url ||
-      data?.output?.[0]?.url ||
-      demoImage;
+    if (data?.images?.[0]?.url) {
+      return res.status(200).json({ url: data.images[0].url });
+    }
 
-    return success(res, { imageUrl });
+    if (data?.output?.[0]?.url) {
+      return res.status(200).json({ url: data.output[0].url });
+    }
 
-  } catch (err) {
-    return success(res, { imageUrl: demoImage });
+    return res.status(200).json({ url: demoImage });
+
+  } catch (error) {
+    return res.status(200).json({ url: demoImage });
   }
 }
