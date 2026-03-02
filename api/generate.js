@@ -1,9 +1,30 @@
-// ===== SIMPLE IN-MEMORY RATE LIMIT =====
 const rateLimitMap = new Map();
+
+const MODELS = {
+  fal: {
+    endpoint: "https://fal.run/fal-ai/fast-sdxl"
+  }
+};
+
+function success(res, payload) {
+  return res.status(200).json({
+    success: true,
+    data: payload,
+    error: null
+  });
+}
+
+function fail(res, message, code = 400) {
+  return res.status(code).json({
+    success: false,
+    data: null,
+    error: message
+  });
+}
 
 function isRateLimited(ip) {
   const now = Date.now();
-  const windowMs = 10 * 60 * 1000; // 10 minutes
+  const windowMs = 10 * 60 * 1000;
   const maxRequests = 10;
 
   if (!rateLimitMap.has(ip)) {
@@ -20,79 +41,64 @@ function isRateLimited(ip) {
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return fail(res, "Method not allowed", 405);
   }
 
-  // Get user IP
   const ip =
-    req.headers["x-forwarded-for"]?.split(",")[0] ||
+    req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
     req.socket?.remoteAddress ||
     "unknown";
 
-  // Rate limit check
   if (isRateLimited(ip)) {
-    return res.status(429).json({
-      error: "Too many requests. Please wait 10 minutes."
-    });
+    return fail(res, "Too many requests. Wait 10 minutes.", 429);
   }
 
-  const { prompt } = req.body;
+  const { prompt, model = "fal" } = req.body;
 
   if (!prompt || typeof prompt !== "string") {
-    return res.status(400).json({ error: "Invalid prompt" });
+    return fail(res, "Invalid prompt");
   }
 
   if (prompt.length > 500) {
-    return res.status(400).json({ error: "Prompt too long" });
+    return fail(res, "Prompt too long (max 500 characters)");
   }
 
   const FAL_KEY = process.env.FAL_KEY;
+  const demoImage =
+    "https://images.unsplash.com/photo-1682686580391-615b8b8e0f4c";
 
-  // ===== If No API Key → Demo Mode =====
   if (!FAL_KEY) {
-    return res.status(200).json({
-      url: "https://images.unsplash.com/photo-1682686580391-615b8b8e0f4c"
-    });
+    return success(res, { imageUrl: demoImage });
   }
 
   try {
 
-    const response = await fetch("https://fal.run/fal-ai/fast-sdxl", {
+    const response = await fetch(MODELS[model].endpoint, {
       method: "POST",
       headers: {
-        "Authorization": `Key ${FAL_KEY}`,
+        Authorization: `Key ${FAL_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        prompt: prompt,
+        prompt,
         image_size: "square_hd"
       })
     });
 
+    if (!response.ok) {
+      return success(res, { imageUrl: demoImage });
+    }
+
     const data = await response.json();
 
-    console.log("FAL Response:", data);
+    const imageUrl =
+      data?.images?.[0]?.url ||
+      data?.output?.[0]?.url ||
+      demoImage;
 
-    // Real success
-    if (data.images && data.images[0]?.url) {
-      return res.status(200).json({ url: data.images[0].url });
-    }
+    return success(res, { imageUrl });
 
-    if (data.output && data.output[0]?.url) {
-      return res.status(200).json({ url: data.output[0].url });
-    }
-
-    // If API error or balance exhausted → Demo fallback
-    return res.status(200).json({
-      url: "https://images.unsplash.com/photo-1682686580391-615b8b8e0f4c"
-    });
-
-  } catch (error) {
-    console.error("Server error:", error);
-
-    // Any crash → Demo fallback
-    return res.status(200).json({
-      url: "https://images.unsplash.com/photo-1682686580391-615b8b8e0f4c"
-    });
+  } catch (err) {
+    return success(res, { imageUrl: demoImage });
   }
 }
