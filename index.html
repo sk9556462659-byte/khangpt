@@ -86,8 +86,8 @@ margin-top:10px;
 
 <div class="right">
 <span id="userName"></span>
-<button type="button" id="loginBtn" onclick="googleLogin()">Login</button>
-<button type="button" id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+<button id="loginBtn">Login</button>
+<button id="logoutBtn" style="display:none;">Logout</button>
 </div>
 </div>
 
@@ -98,7 +98,7 @@ margin-top:10px;
 <div class="generator">
 <input type="text" id="prompt" placeholder="Enter your prompt">
 <br><br>
-<button type="button" onclick="generateImage()">Generate</button>
+<button id="generateBtn">Generate</button>
 
 <div class="usage" id="usageText"></div>
 <div id="result"></div>
@@ -118,49 +118,62 @@ const firebaseConfig = {
   appId: "1:317363736581:web:cf95d06102c5b056290c6c"
 };
 
+/* Prevent double initialize */
+if (!firebase.apps.length) {
 firebase.initializeApp(firebaseConfig);
+}
+
 const auth = firebase.auth();
+
+/* Enable persistence */
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 let currentUser = null;
 const MAX_FREE = 2;
 
 /* Handle redirect result */
 auth.getRedirectResult()
-.then((result)=>{
-if(result.user){
-console.log("Redirect Login Success");
+.then((result) => {
+if (result.user) {
+console.log("Login success");
+window.location.href = window.location.origin;
 }
 })
-.catch((error)=>{
-console.error("Redirect Error:", error);
+.catch((error) => {
+console.error("Redirect error:", error);
 });
 
-/* Auth state listener */
-auth.onAuthStateChanged((user)=>{
-if(user){
+/* Auth state */
+auth.onAuthStateChanged((user) => {
+if (user) {
 currentUser = user;
 document.getElementById("userName").innerText = user.displayName;
-document.getElementById("loginBtn").style.display="none";
-document.getElementById("logoutBtn").style.display="inline-block";
-}else{
+document.getElementById("loginBtn").style.display = "none";
+document.getElementById("logoutBtn").style.display = "inline-block";
+} else {
 currentUser = null;
-document.getElementById("userName").innerText="";
-document.getElementById("loginBtn").style.display="inline-block";
-document.getElementById("logoutBtn").style.display="none";
+document.getElementById("userName").innerText = "";
+document.getElementById("loginBtn").style.display = "inline-block";
+document.getElementById("logoutBtn").style.display = "none";
 }
 updateUsage();
 });
 
-/* Redirect Login */
-function googleLogin(){
+/* Button Events */
+document.getElementById("loginBtn").addEventListener("click", () => {
 const provider = new firebase.auth.GoogleAuthProvider();
 auth.signInWithRedirect(provider);
-}
+});
 
-function logout(){
-auth.signOut();
-}
+document.getElementById("logoutBtn").addEventListener("click", () => {
+auth.signOut().then(() => {
+window.location.reload();
+});
+});
 
+document.getElementById("generateBtn").addEventListener("click", generateImage);
+
+/* Usage System */
 function usageKey(){
 if(!currentUser) return "guest_usage";
 return "usage_"+currentUser.uid+"_"+new Date().toISOString().split('T')[0];
@@ -175,33 +188,35 @@ localStorage.setItem(usageKey(), getUsage()+1);
 }
 
 function updateUsage(){
-document.getElementById("usageText").innerText=
-"Free Usage: "+getUsage()+"/"+MAX_FREE;
+document.getElementById("usageText").innerText =
+"Free Usage: " + getUsage() + "/" + MAX_FREE;
 }
 
 async function generateImage(){
-
-const prompt=document.getElementById("prompt").value.trim();
+const prompt = document.getElementById("prompt").value.trim();
 if(!prompt) return;
 
-if(getUsage()>=MAX_FREE){
+if(getUsage() >= MAX_FREE){
 alert("Free limit reached. Upgrade coming soon.");
 return;
 }
 
 try{
-const res=await fetch("/api/generate",{
+const res = await fetch("/api/generate",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({prompt})
 });
-const data=await res.json();
+
+const data = await res.json();
+
 if(data.url){
 increaseUsage();
 updateUsage();
-document.getElementById("result").innerHTML=
+document.getElementById("result").innerHTML =
 '<img src="'+data.url+'">';
 }
+
 }catch(err){
 console.error(err);
 alert("Image generation failed.");
