@@ -12,7 +12,6 @@ background:#0f0c29;
 color:white;
 }
 
-/* NAV */
 .nav{
 display:flex;
 justify-content:space-between;
@@ -52,7 +51,6 @@ cursor:pointer;
 font-weight:bold;
 }
 
-/* HERO */
 .hero{
 text-align:center;
 padding:40px 20px;
@@ -94,8 +92,8 @@ margin-top:10px;
 
 <div class="right">
 <span id="userName"></span>
-<button id="loginBtn" onclick="googleLogin()">Login</button>
-<button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+<button type="button" id="loginBtn" onclick="googleLogin()">Login</button>
+<button type="button" id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
 </div>
 </div>
 
@@ -106,10 +104,9 @@ margin-top:10px;
 <div class="generator">
 <input type="text" id="prompt" placeholder="Enter your prompt">
 <br><br>
-<button onclick="generateImage()">Generate</button>
+<button type="button" onclick="generateImage()">Generate</button>
 
 <div class="usage" id="usageText"></div>
-
 <div id="result"></div>
 </div>
 
@@ -119,7 +116,7 @@ margin-top:10px;
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
+  apiKey: "YOUR_API_KEY",
   authDomain: "khangpt-4176b.firebaseapp.com",
   projectId: "khangpt-4176b",
   storageBucket: "khangpt-4176b.firebasestorage.app",
@@ -132,6 +129,10 @@ const auth = firebase.auth();
 
 let currentUser = null;
 const MAX_FREE = 2;
+
+auth.getRedirectResult().catch((error)=>{
+console.error("Redirect Error:", error);
+});
 
 auth.onAuthStateChanged((user)=>{
 if(user){
@@ -150,7 +151,15 @@ updateUsage();
 
 function googleLogin(){
 const provider = new firebase.auth.GoogleAuthProvider();
-auth.signInWithPopup(provider);
+
+auth.signInWithPopup(provider)
+.then((result)=>{
+console.log("Login Success:", result.user);
+})
+.catch((error)=>{
+console.error("Login Error:", error);
+alert("Login failed: " + error.message);
+});
 }
 
 function logout(){
@@ -200,6 +209,7 @@ document.getElementById("result").innerHTML=
 }
 }catch(err){
 console.error(err);
+alert("Image generation failed.");
 }
 }
 </script>
