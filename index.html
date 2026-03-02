@@ -192,27 +192,138 @@ opacity:0.6;
 </div>
 
 <script>
+
 function scrollToGenerate(){
-document.getElementById("generate").scrollIntoView();
+  document.getElementById("generate").scrollIntoView();
 }
+
+/* ===== PREMIUM LIMIT SYSTEM ===== */
+
+const MAX_FREE = 2;
+
+function getTodayKey(){
+  const today = new Date();
+  return "usage_" + today.toISOString().split('T')[0];
+}
+
+function getUsage(){
+  return parseInt(localStorage.getItem(getTodayKey())) || 0;
+}
+
+function increaseUsage(){
+  localStorage.setItem(getTodayKey(), getUsage() + 1);
+}
+
+function showPremiumLock(){
+
+  if(document.getElementById("premiumLock")) return;
+
+  document.body.insertAdjacentHTML("beforeend", `
+  <div id="premiumLock" style="
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.85);
+    backdrop-filter:blur(8px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;">
+    
+    <div style="
+      background:#111;
+      padding:40px;
+      border-radius:25px;
+      text-align:center;
+      width:90%;
+      max-width:380px;
+      box-shadow:0 0 40px rgba(255,215,0,0.3);">
+
+      <div style="
+        display:inline-block;
+        padding:6px 15px;
+        border-radius:20px;
+        background:linear-gradient(90deg,gold,#ffcc00);
+        font-weight:bold;
+        margin-bottom:15px;">
+        PRO
+      </div>
+
+      <h2>Unlock KhanGPT Pro</h2>
+      <p style="opacity:0.7;margin:15px 0;">
+        You’ve reached your free limit.<br>
+        Upgrade to generate unlimited AI images.
+      </p>
+
+      <button style="
+        width:100%;
+        padding:14px;
+        border:none;
+        border-radius:15px;
+        background:linear-gradient(90deg,gold,#ffcc00);
+        font-weight:bold;
+        cursor:pointer;
+        font-size:15px;">
+        Upgrade to Pro
+      </button>
+
+      <button onclick="closeLock()" style="
+        margin-top:15px;
+        background:none;
+        border:none;
+        color:#aaa;
+        cursor:pointer;">
+        Not Now
+      </button>
+
+    </div>
+  </div>
+  `);
+}
+
+function closeLock(){
+  const lock = document.getElementById("premiumLock");
+  if(lock) lock.remove();
+}
+
+/* ===== IMAGE GENERATION ===== */
 
 async function generateImage(){
-const prompt=document.getElementById("prompt").value.trim();
-if(!prompt) return;
 
-const response=await fetch("/api/generate",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt})
-});
+  const promptInput = document.getElementById("prompt");
+  const resultBox = document.getElementById("result");
 
-const data=await response.json();
+  if(!promptInput || !resultBox) return;
 
-if(data.url){
-document.getElementById("result").innerHTML =
-'<img src="'+data.url+'"/>';
+  const prompt = promptInput.value.trim();
+  if(!prompt) return;
+
+  if(getUsage() >= MAX_FREE){
+    showPremiumLock();
+    return;
+  }
+
+  try{
+
+    const response = await fetch("/api/generate",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({prompt})
+    });
+
+    const data = await response.json();
+
+    if(data.url){
+      increaseUsage();
+      resultBox.innerHTML =
+        '<img src="'+data.url+'" style="margin-top:25px;border-radius:15px;max-width:90%"/>';
+    }
+
+  }catch(e){
+    console.error("Generation error:", e);
+  }
+
 }
-}
+
 </script>
 
 </body>
