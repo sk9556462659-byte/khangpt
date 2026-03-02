@@ -117,105 +117,101 @@ const firebaseConfig = {
   appId: "1:317363736581:web:cf95d06102c5b056290c6c"
 };
 
+/* Safe initialize */
 if (!firebase.apps.length) {
-firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig);
 }
 
 const auth = firebase.auth();
+
+/* Important: Use LOCAL persistence */
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 let currentUser = null;
 const MAX_FREE = 2;
 
-/* 🔥 FIXED REDIRECT HANDLER */
-auth.getRedirectResult()
-.then((result) => {
-if (result.user) {
-window.location.replace("https://khangpt.vercel.app");
-}
-})
-.catch((error) => {
-console.error("Redirect error:", error);
-});
+/* 🔥 REMOVE getRedirectResult completely */
+/* 🔥 REMOVE window.location.replace completely */
 
-/* Auth State */
+/* Auth state listener (THIS handles everything) */
 auth.onAuthStateChanged((user) => {
-if (user) {
-currentUser = user;
-document.getElementById("userName").innerText = user.displayName;
-document.getElementById("loginBtn").style.display = "none";
-document.getElementById("logoutBtn").style.display = "inline-block";
-} else {
-currentUser = null;
-document.getElementById("userName").innerText = "";
-document.getElementById("loginBtn").style.display = "inline-block";
-document.getElementById("logoutBtn").style.display = "none";
-}
-updateUsage();
+  if (user) {
+    currentUser = user;
+    document.getElementById("userName").innerText = user.displayName || user.email;
+    document.getElementById("loginBtn").style.display = "none";
+    document.getElementById("logoutBtn").style.display = "inline-block";
+  } else {
+    currentUser = null;
+    document.getElementById("userName").innerText = "";
+    document.getElementById("loginBtn").style.display = "inline-block";
+    document.getElementById("logoutBtn").style.display = "none";
+  }
+  updateUsage();
 });
 
 /* Login */
-document.getElementById("loginBtn").addEventListener("click", () => {
-const provider = new firebase.auth.GoogleAuthProvider();
-auth.signInWithRedirect(provider);
-});
+document.getElementById("loginBtn").onclick = function(){
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithRedirect(provider);
+};
 
 /* Logout */
-document.getElementById("logoutBtn").addEventListener("click", () => {
-auth.signOut().then(() => {
-window.location.reload();
-});
-});
+document.getElementById("logoutBtn").onclick = function(){
+  auth.signOut();
+};
 
-document.getElementById("generateBtn").addEventListener("click", generateImage);
-
+/* Usage System */
 function usageKey(){
-if(!currentUser) return "guest_usage";
-return "usage_"+currentUser.uid+"_"+new Date().toISOString().split('T')[0];
+  if(!currentUser) return "guest_usage";
+  return "usage_"+currentUser.uid+"_"+new Date().toISOString().split('T')[0];
 }
 
 function getUsage(){
-return parseInt(localStorage.getItem(usageKey())) || 0;
+  return parseInt(localStorage.getItem(usageKey())) || 0;
 }
 
 function increaseUsage(){
-localStorage.setItem(usageKey(), getUsage()+1);
+  localStorage.setItem(usageKey(), getUsage()+1);
 }
 
 function updateUsage(){
-document.getElementById("usageText").innerText =
-"Free Usage: " + getUsage() + "/" + MAX_FREE;
+  document.getElementById("usageText").innerText =
+  "Free Usage: " + getUsage() + "/" + MAX_FREE;
 }
+
+/* Generate */
+document.getElementById("generateBtn").onclick = generateImage;
 
 async function generateImage(){
-const prompt = document.getElementById("prompt").value.trim();
-if(!prompt) return;
 
-if(getUsage() >= MAX_FREE){
-alert("Free limit reached. Upgrade coming soon.");
-return;
-}
+  const prompt = document.getElementById("prompt").value.trim();
+  if(!prompt) return;
 
-try{
-const res = await fetch("/api/generate",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt})
-});
+  if(getUsage() >= MAX_FREE){
+    alert("Free limit reached. Upgrade coming soon.");
+    return;
+  }
 
-const data = await res.json();
+  try{
+    const res = await fetch("/api/generate",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({prompt})
+    });
 
-if(data.url){
-increaseUsage();
-updateUsage();
-document.getElementById("result").innerHTML =
-'<img src="'+data.url+'">';
-}
+    const data = await res.json();
 
-}catch(err){
-console.error(err);
-alert("Image generation failed.");
-}
+    if(data.url){
+      increaseUsage();
+      updateUsage();
+      document.getElementById("result").innerHTML =
+      '<img src="'+data.url+'">';
+    }
+
+  }catch(err){
+    console.error(err);
+    alert("Image generation failed.");
+  }
 }
 </script>
 
