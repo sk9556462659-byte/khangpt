@@ -23,12 +23,6 @@ position:sticky;
 top:0;
 }
 
-.brand{
-display:flex;
-align-items:center;
-gap:10px;
-}
-
 .brand h2{
 margin:0;
 background:linear-gradient(90deg,gold,#fff);
@@ -116,7 +110,7 @@ margin-top:10px;
 
 <script>
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
+  apiKey: "AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
   authDomain: "khangpt-4176b.firebaseapp.com",
   projectId: "khangpt-4176b",
   storageBucket: "khangpt-4176b.firebasestorage.app",
@@ -130,10 +124,18 @@ const auth = firebase.auth();
 let currentUser = null;
 const MAX_FREE = 2;
 
-auth.getRedirectResult().catch((error)=>{
+/* Handle redirect result */
+auth.getRedirectResult()
+.then((result)=>{
+if(result.user){
+console.log("Redirect Login Success");
+}
+})
+.catch((error)=>{
 console.error("Redirect Error:", error);
 });
 
+/* Auth state listener */
 auth.onAuthStateChanged((user)=>{
 if(user){
 currentUser = user;
@@ -149,17 +151,10 @@ document.getElementById("logoutBtn").style.display="none";
 updateUsage();
 });
 
+/* Redirect Login */
 function googleLogin(){
 const provider = new firebase.auth.GoogleAuthProvider();
-
-auth.signInWithPopup(provider)
-.then((result)=>{
-console.log("Login Success:", result.user);
-})
-.catch((error)=>{
-console.error("Login Error:", error);
-alert("Login failed: " + error.message);
-});
+auth.signInWithRedirect(provider);
 }
 
 function logout(){
