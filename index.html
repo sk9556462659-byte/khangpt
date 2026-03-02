@@ -1,151 +1,207 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>KhanGPT</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background: #0f0f0f;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 30px;
-    }
+<title>KhanGPT AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    h1 {
-      font-size: 36px;
-      margin-bottom: 5px;
-    }
+<style>
+body{
+margin:0;
+font-family:'Segoe UI',sans-serif;
+background:#0f0c29;
+color:white;
+}
 
-    input {
-      width: 80%;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      margin-top: 20px;
-      font-size: 16px;
-    }
+/* NAV */
+.nav{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 20px;
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(10px);
+position:sticky;
+top:0;
+}
 
-    button {
-      margin-top: 15px;
-      padding: 12px 25px;
-      background: gold;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 16px;
-    }
+.brand{
+display:flex;
+align-items:center;
+gap:10px;
+}
 
-    button:disabled {
-      background: gray;
-      cursor: not-allowed;
-    }
+.brand h2{
+margin:0;
+background:linear-gradient(90deg,gold,#fff);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
 
-    .spinner {
-      margin-top: 15px;
-      display: none;
-    }
+.right{
+display:flex;
+align-items:center;
+gap:10px;
+}
 
-    img {
-      margin-top: 20px;
-      max-width: 100%;
-      border-radius: 12px;
-    }
+button{
+padding:8px 14px;
+border:none;
+border-radius:10px;
+background:gold;
+cursor:pointer;
+font-weight:bold;
+}
 
-    .gallery {
-      margin-top: 30px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 10px;
-    }
+/* HERO */
+.hero{
+text-align:center;
+padding:40px 20px;
+}
 
-    .gallery img {
-      width: 100%;
-      border-radius: 10px;
-    }
+.generator{
+text-align:center;
+padding:20px;
+}
 
-  </style>
+.generator input{
+width:90%;
+max-width:500px;
+padding:12px;
+border:none;
+border-radius:10px;
+}
+
+#result img{
+margin-top:20px;
+max-width:90%;
+border-radius:15px;
+}
+
+.usage{
+font-size:12px;
+opacity:.7;
+margin-top:10px;
+}
+</style>
 </head>
 
 <body>
 
-<h1>KhanGPT</h1>
-<p>Create AI Images</p>
+<div class="nav">
+<div class="brand">
+<h2>KhanGPT</h2>
+</div>
 
-<input type="text" id="prompt" placeholder="Enter your prompt..." />
-<br>
-<button id="generateBtn" onclick="generateImage()">Generate</button>
+<div class="right">
+<span id="userName"></span>
+<button id="loginBtn" onclick="googleLogin()">Login</button>
+<button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+</div>
+</div>
 
-<div class="spinner" id="loading">⏳ Generating...</div>
+<div class="hero">
+<h1>Create Stunning AI Images</h1>
+</div>
+
+<div class="generator">
+<input type="text" id="prompt" placeholder="Enter your prompt">
+<br><br>
+<button onclick="generateImage()">Generate</button>
+
+<div class="usage" id="usageText"></div>
 
 <div id="result"></div>
+</div>
 
-<h3 style="margin-top:40px;">History</h3>
-<div class="gallery" id="gallery"></div>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
+  authDomain: "khangpt-4176b.firebaseapp.com",
+  projectId: "khangpt-4176b",
+  storageBucket: "khangpt-4176b.firebasestorage.app",
+  messagingSenderId: "317363736581",
+  appId: "1:317363736581:web:cf95d06102c5b056290c6c"
+};
 
-let historyImages = [];
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-async function generateImage() {
+let currentUser = null;
+const MAX_FREE = 2;
 
-  const prompt = document.getElementById("prompt").value;
-  const btn = document.getElementById("generateBtn");
-  const loading = document.getElementById("loading");
+auth.onAuthStateChanged((user)=>{
+if(user){
+currentUser = user;
+document.getElementById("userName").innerText = user.displayName;
+document.getElementById("loginBtn").style.display="none";
+document.getElementById("logoutBtn").style.display="inline-block";
+}else{
+currentUser = null;
+document.getElementById("userName").innerText="";
+document.getElementById("loginBtn").style.display="inline-block";
+document.getElementById("logoutBtn").style.display="none";
+}
+updateUsage();
+});
 
-  if (!prompt) {
-    alert("Enter prompt first");
-    return;
-  }
-
-  btn.disabled = true;
-  loading.style.display = "block";
-
-  try {
-
-    const response = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ prompt })
-    });
-
-    const data = await response.json();
-
-    if (data.image) {
-
-      document.getElementById("result").innerHTML =
-        `<img src="${data.image}" />
-         <br>
-         <a href="${data.image}" download>
-           <button>Download</button>
-         </a>`;
-
-      historyImages.unshift(data.image);
-      updateGallery();
-
-    } else {
-      alert(data.error || "Generation failed");
-    }
-
-  } catch (error) {
-    alert("Server error");
-  }
-
-  btn.disabled = false;
-  loading.style.display = "none";
+function googleLogin(){
+const provider = new firebase.auth.GoogleAuthProvider();
+auth.signInWithPopup(provider);
 }
 
-function updateGallery() {
-  const gallery = document.getElementById("gallery");
-  gallery.innerHTML = historyImages
-    .slice(0, 6)
-    .map(img => `<img src="${img}" />`)
-    .join("");
+function logout(){
+auth.signOut();
 }
 
+function usageKey(){
+if(!currentUser) return "guest_usage";
+return "usage_"+currentUser.uid+"_"+new Date().toISOString().split('T')[0];
+}
+
+function getUsage(){
+return parseInt(localStorage.getItem(usageKey())) || 0;
+}
+
+function increaseUsage(){
+localStorage.setItem(usageKey(), getUsage()+1);
+}
+
+function updateUsage(){
+document.getElementById("usageText").innerText=
+"Free Usage: "+getUsage()+"/"+MAX_FREE;
+}
+
+async function generateImage(){
+
+const prompt=document.getElementById("prompt").value.trim();
+if(!prompt) return;
+
+if(getUsage()>=MAX_FREE){
+alert("Free limit reached. Upgrade coming soon.");
+return;
+}
+
+try{
+const res=await fetch("/api/generate",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt})
+});
+const data=await res.json();
+if(data.url){
+increaseUsage();
+updateUsage();
+document.getElementById("result").innerHTML=
+'<img src="'+data.url+'">';
+}
+}catch(err){
+console.error(err);
+}
+}
 </script>
 
 </body>
