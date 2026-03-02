@@ -10,129 +10,77 @@ margin:0;
 font-family:'Segoe UI',sans-serif;
 background:#0f0c29;
 color:white;
-scroll-behavior:smooth;
 }
 
-/* NAVBAR */
+/* NAV */
 .nav{
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:20px 40px;
+padding:15px 20px;
 background:rgba(255,255,255,0.05);
 backdrop-filter:blur(10px);
 position:sticky;
 top:0;
 }
-.nav h2{
+
+.brand{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.brand h2{
+margin:0;
 background:linear-gradient(90deg,gold,#fff);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
 }
-.nav button{
-padding:10px 20px;
+
+.right{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+button{
+padding:8px 14px;
 border:none;
-border-radius:20px;
+border-radius:10px;
 background:gold;
 cursor:pointer;
+font-weight:bold;
 }
 
 /* HERO */
 .hero{
 text-align:center;
-padding:80px 20px;
-background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
-}
-.hero h1{
-font-size:40px;
-margin-bottom:20px;
-}
-.hero p{
-opacity:0.8;
-margin-bottom:30px;
-}
-.hero button{
-padding:15px 30px;
-border:none;
-border-radius:30px;
-background:gold;
-font-size:16px;
-cursor:pointer;
+padding:40px 20px;
 }
 
-/* GENERATOR */
 .generator{
 text-align:center;
-padding:60px 20px;
+padding:20px;
 }
+
 .generator input{
 width:90%;
 max-width:500px;
-padding:15px;
+padding:12px;
 border:none;
 border-radius:10px;
-font-size:16px;
-margin-top:20px;
 }
-.generator button{
-padding:15px 25px;
-border:none;
-border-radius:10px;
-background:gold;
-cursor:pointer;
-margin-top:15px;
-}
+
 #result img{
-margin-top:30px;
+margin-top:20px;
 max-width:90%;
 border-radius:15px;
 }
 
-/* FEATURES */
-.features{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:20px;
-padding:60px 20px;
-background:#14112e;
-}
-.card{
-width:250px;
-padding:20px;
-border-radius:15px;
-background:rgba(255,255,255,0.05);
-text-align:center;
-}
-
-/* PRICING */
-.pricing{
-text-align:center;
-padding:60px 20px;
-}
-.price-card{
-display:inline-block;
-margin:20px;
-padding:30px;
-border-radius:20px;
-background:rgba(255,255,255,0.08);
-}
-.price-card button{
-margin-top:15px;
-padding:10px 20px;
-border:none;
-border-radius:10px;
-background:gold;
-cursor:pointer;
-}
-
-/* FOOTER */
-.footer{
-text-align:center;
-padding:30px;
-background:#0c0a1d;
-font-size:14px;
-opacity:0.6;
+.usage{
+font-size:12px;
+opacity:.7;
+margin-top:10px;
 }
 </style>
 </head>
@@ -140,190 +88,120 @@ opacity:0.6;
 <body>
 
 <div class="nav">
+<div class="brand">
 <h2>KhanGPT</h2>
-<button onclick="scrollToGenerate()">Generate</button>
+</div>
+
+<div class="right">
+<span id="userName"></span>
+<button id="loginBtn" onclick="googleLogin()">Login</button>
+<button id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+</div>
 </div>
 
 <div class="hero">
-<h1>Create Stunning AI Images in Seconds</h1>
-<p>Professional AI image generator powered by next-gen models.</p>
-<button onclick="scrollToGenerate()">Start Creating</button>
+<h1>Create Stunning AI Images</h1>
 </div>
 
-<div class="generator" id="generate">
-<h2>Generate Your Image</h2>
-<input type="text" id="prompt" placeholder="Enter your creative prompt...">
-<br>
-<button onclick="generateImage()">Generate Image</button>
+<div class="generator">
+<input type="text" id="prompt" placeholder="Enter your prompt">
+<br><br>
+<button onclick="generateImage()">Generate</button>
+
+<div class="usage" id="usageText"></div>
+
 <div id="result"></div>
 </div>
 
-<div class="features">
-<div class="card">
-<h3>Fast Generation</h3>
-<p>Lightning fast AI rendering.</p>
-</div>
-<div class="card">
-<h3>High Quality</h3>
-<p>Ultra HD image output.</p>
-</div>
-<div class="card">
-<h3>Secure System</h3>
-<p>Rate limited & safe backend.</p>
-</div>
-</div>
-
-<div class="pricing">
-<h2>Pricing</h2>
-<div class="price-card">
-<h3>Free</h3>
-<p>Limited Generations</p>
-<button>Current Plan</button>
-</div>
-<div class="price-card">
-<h3>Premium</h3>
-<p>Unlimited + No Watermark</p>
-<button>Upgrade</button>
-</div>
-</div>
-
-<div class="footer">
-© 2026 KhanGPT AI. All rights reserved.
-</div>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
+  authDomain: "khangpt-4176b.firebaseapp.com",
+  projectId: "khangpt-4176b",
+  storageBucket: "khangpt-4176b.firebasestorage.app",
+  messagingSenderId: "317363736581",
+  appId: "1:317363736581:web:cf95d06102c5b056290c6c"
+};
 
-function scrollToGenerate(){
-  document.getElementById("generate").scrollIntoView();
-}
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-/* ===== PREMIUM LIMIT SYSTEM ===== */
-
+let currentUser = null;
 const MAX_FREE = 2;
 
-function getTodayKey(){
-  const today = new Date();
-  return "usage_" + today.toISOString().split('T')[0];
+auth.onAuthStateChanged((user)=>{
+if(user){
+currentUser = user;
+document.getElementById("userName").innerText = user.displayName;
+document.getElementById("loginBtn").style.display="none";
+document.getElementById("logoutBtn").style.display="inline-block";
+}else{
+currentUser = null;
+document.getElementById("userName").innerText="";
+document.getElementById("loginBtn").style.display="inline-block";
+document.getElementById("logoutBtn").style.display="none";
+}
+updateUsage();
+});
+
+function googleLogin(){
+const provider = new firebase.auth.GoogleAuthProvider();
+auth.signInWithPopup(provider);
+}
+
+function logout(){
+auth.signOut();
+}
+
+function usageKey(){
+if(!currentUser) return "guest_usage";
+return "usage_"+currentUser.uid+"_"+new Date().toISOString().split('T')[0];
 }
 
 function getUsage(){
-  return parseInt(localStorage.getItem(getTodayKey())) || 0;
+return parseInt(localStorage.getItem(usageKey())) || 0;
 }
 
 function increaseUsage(){
-  localStorage.setItem(getTodayKey(), getUsage() + 1);
+localStorage.setItem(usageKey(), getUsage()+1);
 }
 
-function showPremiumLock(){
-
-  if(document.getElementById("premiumLock")) return;
-
-  document.body.insertAdjacentHTML("beforeend", `
-  <div id="premiumLock" style="
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.85);
-    backdrop-filter:blur(8px);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:9999;">
-    
-    <div style="
-      background:#111;
-      padding:40px;
-      border-radius:25px;
-      text-align:center;
-      width:90%;
-      max-width:380px;
-      box-shadow:0 0 40px rgba(255,215,0,0.3);">
-
-      <div style="
-        display:inline-block;
-        padding:6px 15px;
-        border-radius:20px;
-        background:linear-gradient(90deg,gold,#ffcc00);
-        font-weight:bold;
-        margin-bottom:15px;">
-        PRO
-      </div>
-
-      <h2>Unlock KhanGPT Pro</h2>
-      <p style="opacity:0.7;margin:15px 0;">
-        You’ve reached your free limit.<br>
-        Upgrade to generate unlimited AI images.
-      </p>
-
-      <button style="
-        width:100%;
-        padding:14px;
-        border:none;
-        border-radius:15px;
-        background:linear-gradient(90deg,gold,#ffcc00);
-        font-weight:bold;
-        cursor:pointer;
-        font-size:15px;">
-        Upgrade to Pro
-      </button>
-
-      <button onclick="closeLock()" style="
-        margin-top:15px;
-        background:none;
-        border:none;
-        color:#aaa;
-        cursor:pointer;">
-        Not Now
-      </button>
-
-    </div>
-  </div>
-  `);
+function updateUsage(){
+document.getElementById("usageText").innerText=
+"Free Usage: "+getUsage()+"/"+MAX_FREE;
 }
-
-function closeLock(){
-  const lock = document.getElementById("premiumLock");
-  if(lock) lock.remove();
-}
-
-/* ===== IMAGE GENERATION ===== */
 
 async function generateImage(){
 
-  const promptInput = document.getElementById("prompt");
-  const resultBox = document.getElementById("result");
+const prompt=document.getElementById("prompt").value.trim();
+if(!prompt) return;
 
-  if(!promptInput || !resultBox) return;
-
-  const prompt = promptInput.value.trim();
-  if(!prompt) return;
-
-  if(getUsage() >= MAX_FREE){
-    showPremiumLock();
-    return;
-  }
-
-  try{
-
-    const response = await fetch("/api/generate",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({prompt})
-    });
-
-    const data = await response.json();
-
-    if(data.url){
-      increaseUsage();
-      resultBox.innerHTML =
-        '<img src="'+data.url+'" style="margin-top:25px;border-radius:15px;max-width:90%"/>';
-    }
-
-  }catch(e){
-    console.error("Generation error:", e);
-  }
-
+if(getUsage()>=MAX_FREE){
+alert("Free limit reached. Upgrade coming soon.");
+return;
 }
 
+try{
+const res=await fetch("/api/generate",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt})
+});
+const data=await res.json();
+if(data.url){
+increaseUsage();
+updateUsage();
+document.getElementById("result").innerHTML=
+'<img src="'+data.url+'">';
+}
+}catch(err){
+console.error(err);
+}
+}
 </script>
 
 </body>
