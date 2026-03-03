@@ -66,7 +66,6 @@ const db = firebase.firestore();
 let currentUser = null;
 let userCredits = 0;
 
-/* AUTH LISTENER */
 auth.onAuthStateChanged(async (user) => {
 
   if (user) {
@@ -111,16 +110,20 @@ document.getElementById("logoutBtn").onclick = () => {
   auth.signOut();
 };
 
-/* CREATE OR FETCH USER */
+/* DAILY RESET SYSTEM */
 async function setupUserData(){
 
   const userRef = db.collection("users").doc(currentUser.uid);
   const doc = await userRef.get();
 
+  const now = Date.now();
+  const oneDay = 24 * 60 * 60 * 1000;
+
   if (!doc.exists) {
 
     await userRef.set({
       credits: 5,
+      lastReset: now,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
@@ -128,7 +131,22 @@ async function setupUserData(){
 
   } else {
 
-    userCredits = doc.data().credits || 0;
+    const data = doc.data();
+    const lastReset = data.lastReset || 0;
+
+    if (now - lastReset > oneDay) {
+
+      await userRef.update({
+        credits: 5,
+        lastReset: now
+      });
+
+      userCredits = 5;
+
+    } else {
+
+      userCredits = data.credits || 0;
+    }
   }
 
   updateUsageUI();
@@ -157,13 +175,12 @@ async function loadHistory(){
   });
 }
 
-/* UPDATE UI */
 function updateUsageUI(){
   document.getElementById("usageText").innerText =
   "Credits: " + userCredits;
 }
 
-/* GENERATE IMAGE */
+/* GENERATE */
 document.getElementById("generateBtn").onclick = async function(){
 
   const prompt = document.getElementById("prompt").value.trim();
