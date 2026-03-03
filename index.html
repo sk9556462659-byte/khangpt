@@ -41,7 +41,6 @@ button{padding:8px 14px;border:none;border-radius:10px;background:gold;cursor:po
 
 <h2 style="margin-top:40px;">My Images</h2>
 <div id="history" class="history"></div>
-
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -71,7 +70,6 @@ auth.onAuthStateChanged(async (user) => {
   if (user) {
 
     currentUser = user;
-
     document.getElementById("userName").innerText =
       user.displayName || user.email;
 
@@ -95,22 +93,15 @@ auth.onAuthStateChanged(async (user) => {
   }
 });
 
-/* LOGIN */
 document.getElementById("loginBtn").onclick = async () => {
   const provider = new firebase.auth.GoogleAuthProvider();
-  try {
-    await auth.signInWithPopup(provider);
-  } catch (error) {
-    alert(error.message);
-  }
+  await auth.signInWithPopup(provider);
 };
 
-/* LOGOUT */
 document.getElementById("logoutBtn").onclick = () => {
   auth.signOut();
 };
 
-/* DAILY RESET SYSTEM */
 async function setupUserData(){
 
   const userRef = db.collection("users").doc(currentUser.uid);
@@ -152,7 +143,6 @@ async function setupUserData(){
   updateUsageUI();
 }
 
-/* LOAD HISTORY */
 async function loadHistory(){
 
   const snap = await db.collection("users")
@@ -180,7 +170,6 @@ function updateUsageUI(){
   "Credits: " + userCredits;
 }
 
-/* GENERATE */
 document.getElementById("generateBtn").onclick = async function(){
 
   const prompt = document.getElementById("prompt").value.trim();
@@ -200,38 +189,52 @@ document.getElementById("generateBtn").onclick = async function(){
 
     const res = await fetch("/api/generate",{
       method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({prompt})
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({ prompt })
     });
 
-    const data = await res.json();
-
-    if(data.url){
-
-      document.getElementById("result").innerHTML =
-      '<img src="'+data.url+'">';
-
-      await db.collection("users")
-        .doc(currentUser.uid)
-        .collection("images")
-        .add({
-          prompt: prompt,
-          imageUrl: data.url,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-      userCredits--;
-
-      await db.collection("users")
-        .doc(currentUser.uid)
-        .update({ credits: userCredits });
-
-      updateUsageUI();
-      loadHistory();
+    if(!res.ok){
+      alert("Server error: " + res.status);
+      return;
     }
 
+    const text = await res.text();
+
+    if(!text){
+      alert("Empty response from server");
+      return;
+    }
+
+    const data = JSON.parse(text);
+
+    if(!data.url){
+      alert("Image not returned");
+      return;
+    }
+
+    document.getElementById("result").innerHTML =
+      '<img src="'+data.url+'">';
+
+    await db.collection("users")
+      .doc(currentUser.uid)
+      .collection("images")
+      .add({
+        prompt: prompt,
+        imageUrl: data.url,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+    userCredits--;
+
+    await db.collection("users")
+      .doc(currentUser.uid)
+      .update({ credits: userCredits });
+
+    updateUsageUI();
+    loadHistory();
+
   }catch(err){
-    alert("Image generation failed.");
+    alert("Error: " + err.message);
   }
 };
 </script>
