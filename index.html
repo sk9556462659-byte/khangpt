@@ -38,8 +38,10 @@ button{padding:8px 14px;border:none;border-radius:10px;background:gold;cursor:po
 <div id="result"></div>
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -52,73 +54,88 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
 const auth = firebase.auth();
+const db = firebase.firestore();
 
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
 let currentUser = null;
-const MAX_FREE = 2;
+let userCredits = 0;
 
-/* Auth state listener */
-auth.onAuthStateChanged((user) => {
+/* AUTH LISTENER */
+auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
     document.getElementById("userName").innerText = user.displayName || user.email;
     document.getElementById("loginBtn").style.display = "none";
     document.getElementById("logoutBtn").style.display = "inline-block";
+
+    await setupUserData();
+
   } else {
     currentUser = null;
+    userCredits = 0;
     document.getElementById("userName").innerText = "";
     document.getElementById("loginBtn").style.display = "inline-block";
     document.getElementById("logoutBtn").style.display = "none";
+    updateUsageUI();
   }
-  updateUsage();
 });
 
-/* 🔥 Stable Popup Login */
+/* LOGIN */
 document.getElementById("loginBtn").addEventListener("click", async () => {
   const provider = new firebase.auth.GoogleAuthProvider();
   try {
     await auth.signInWithPopup(provider);
   } catch (error) {
-    console.error(error);
     alert(error.message);
   }
 });
 
-/* Logout */
+/* LOGOUT */
 document.getElementById("logoutBtn").addEventListener("click", () => {
   auth.signOut();
 });
 
-/* Usage */
-function usageKey(){
-  if(!currentUser) return "guest_usage";
-  return "usage_"+currentUser.uid+"_"+new Date().toISOString().split('T')[0];
+/* CREATE OR FETCH USER */
+async function setupUserData(){
+  const userRef = db.collection("users").doc(currentUser.uid);
+  const doc = await userRef.get();
+
+  if (!doc.exists) {
+    await userRef.set({
+      credits: 5,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    userCredits = 5;
+  } else {
+    userCredits = doc.data().credits || 0;
+  }
+
+  updateUsageUI();
 }
 
-function getUsage(){
-  return parseInt(localStorage.getItem(usageKey())) || 0;
-}
-
-function increaseUsage(){
-  localStorage.setItem(usageKey(), getUsage()+1);
-}
-
-function updateUsage(){
+/* UPDATE UI */
+function updateUsageUI(){
   document.getElementById("usageText").innerText =
-  "Free Usage: " + getUsage() + "/" + MAX_FREE;
+  "Credits: " + userCredits;
 }
 
-/* Generate */
+/* GENERATE IMAGE */
 document.getElementById("generateBtn").addEventListener("click", generateImage);
 
 async function generateImage(){
   const prompt = document.getElementById("prompt").value.trim();
   if(!prompt) return;
 
-  if(getUsage() >= MAX_FREE){
-    alert("Free limit reached. Upgrade coming soon.");
+  if(!currentUser){
+    alert("Please login first.");
+    return;
+  }
+
+  if(userCredits <= 0){
+    alert("No credits left.");
     return;
   }
 
@@ -132,14 +149,20 @@ async function generateImage(){
     const data = await res.json();
 
     if(data.url){
-      increaseUsage();
-      updateUsage();
+
       document.getElementById("result").innerHTML =
       '<img src="'+data.url+'">';
+
+      userCredits--;
+
+      await db.collection("users")
+        .doc(currentUser.uid)
+        .update({ credits: userCredits });
+
+      updateUsageUI();
     }
 
   }catch(err){
-    console.error(err);
     alert("Image generation failed.");
   }
 }
