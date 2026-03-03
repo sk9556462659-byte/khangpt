@@ -15,6 +15,8 @@ button{padding:8px 14px;border:none;border-radius:10px;background:gold;cursor:po
 .generator input{width:90%;max-width:500px;padding:12px;border:none;border-radius:10px;}
 #result img{margin-top:20px;max-width:90%;border-radius:15px;}
 .usage{font-size:14px;opacity:.9;margin-top:10px;}
+.history{display:flex;flex-wrap:wrap;gap:15px;justify-content:center;margin-top:30px;}
+.history img{width:150px;border-radius:10px;}
 </style>
 </head>
 
@@ -36,9 +38,12 @@ button{padding:8px 14px;border:none;border-radius:10px;background:gold;cursor:po
 <button id="generateBtn">Generate</button>
 <div class="usage" id="usageText">Credits: 0</div>
 <div id="result"></div>
+
+<h2 style="margin-top:40px;">My Images</h2>
+<div id="history" class="history"></div>
+
 </div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -75,6 +80,7 @@ auth.onAuthStateChanged(async (user) => {
     document.getElementById("logoutBtn").style.display = "inline-block";
 
     await setupUserData();
+    loadHistory();
 
   } else {
 
@@ -86,6 +92,7 @@ auth.onAuthStateChanged(async (user) => {
     document.getElementById("logoutBtn").style.display = "none";
 
     updateUsageUI();
+    document.getElementById("history").innerHTML = "";
   }
 });
 
@@ -127,6 +134,29 @@ async function setupUserData(){
   updateUsageUI();
 }
 
+/* LOAD HISTORY */
+async function loadHistory(){
+
+  const snap = await db.collection("users")
+    .doc(currentUser.uid)
+    .collection("images")
+    .orderBy("createdAt","desc")
+    .get();
+
+  const historyDiv = document.getElementById("history");
+  historyDiv.innerHTML = "";
+
+  snap.forEach(doc=>{
+    const data = doc.data();
+    historyDiv.innerHTML += `
+      <div>
+        <img src="${data.imageUrl}">
+        <p style="font-size:11px">${data.prompt}</p>
+      </div>
+    `;
+  });
+}
+
 /* UPDATE UI */
 function updateUsageUI(){
   document.getElementById("usageText").innerText =
@@ -164,6 +194,15 @@ document.getElementById("generateBtn").onclick = async function(){
       document.getElementById("result").innerHTML =
       '<img src="'+data.url+'">';
 
+      await db.collection("users")
+        .doc(currentUser.uid)
+        .collection("images")
+        .add({
+          prompt: prompt,
+          imageUrl: data.url,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
       userCredits--;
 
       await db.collection("users")
@@ -171,6 +210,7 @@ document.getElementById("generateBtn").onclick = async function(){
         .update({ credits: userCredits });
 
       updateUsageUI();
+      loadHistory();
     }
 
   }catch(err){
