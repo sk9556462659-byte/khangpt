@@ -2,7 +2,7 @@ const rateLimitMap = new Map();
 
 function isRateLimited(ip) {
   const now = Date.now();
-  const windowMs = 10 * 60 * 1000; // 10 minutes
+  const windowMs = 10 * 60 * 1000;
   const maxRequests = 10;
 
   if (!rateLimitMap.has(ip)) {
@@ -63,11 +63,12 @@ export default async function handler(req, res) {
   }
 
   const FAL_KEY = process.env.FAL_KEY;
-  const demoImage = "https://picsum.photos/1024";
 
   if (!FAL_KEY) {
-    console.warn("FAL_KEY missing. Returning demo image.");
-    return res.status(200).json({ url: demoImage });
+    console.error("FAL_KEY missing");
+    return res.status(500).json({
+      error: "Server configuration error"
+    });
   }
 
   try {
@@ -75,7 +76,7 @@ export default async function handler(req, res) {
     const response = await fetch("https://fal.run/fal-ai/fast-sdxl", {
       method: "POST",
       headers: {
-        "Authorization": `Key ${FAL_KEY}`,
+        "Authorization": `Bearer ${FAL_KEY}`,   // 🔥 FIXED HERE
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -86,7 +87,9 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      console.error("FAL API error:", response.status);
+      const errText = await response.text();
+      console.error("FAL API error:", response.status, errText);
+
       return res.status(response.status).json({
         error: "Image generation service error"
       });
