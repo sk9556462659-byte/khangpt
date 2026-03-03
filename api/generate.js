@@ -2,7 +2,7 @@ const rateLimitMap = new Map();
 
 function isRateLimited(ip) {
   const now = Date.now();
-  const windowMs = 10 * 60 * 1000;
+  const windowMs = 10 * 60 * 1000; // 10 minutes
   const maxRequests = 10;
 
   if (!rateLimitMap.has(ip)) {
@@ -10,10 +10,31 @@ function isRateLimited(ip) {
   }
 
   const timestamps = rateLimitMap.get(ip).filter(ts => now - ts < windowMs);
+
+  if (timestamps.length >= maxRequests) {
+    return true;
+  }
+
   timestamps.push(now);
   rateLimitMap.set(ip, timestamps);
 
-  return timestamps.length > maxRequests;
+  return false;
+}
+
+function isValidPrompt(prompt) {
+  if (!prompt) return false;
+  if (typeof prompt !== "string") return false;
+  if (prompt.length < 3) return false;
+  if (prompt.length > 300) return false;
+
+  const bannedWords = ["nsfw", "porn", "nude"];
+  const lower = prompt.toLowerCase();
+
+  if (bannedWords.some(word => lower.includes(word))) {
+    return false;
+  }
+
+  return true;
 }
 
 export default async function handler(req, res) {
@@ -35,14 +56,17 @@ export default async function handler(req, res) {
 
   const { prompt } = req.body;
 
-  if (!prompt || typeof prompt !== "string") {
-    return res.status(400).json({ error: "Invalid prompt" });
+  if (!isValidPrompt(prompt)) {
+    return res.status(400).json({
+      error: "Invalid prompt. Must be 3-300 characters and safe content."
+    });
   }
 
   const FAL_KEY = process.env.FAL_KEY;
   const demoImage = "https://picsum.photos/1024";
 
   if (!FAL_KEY) {
+    console.warn("FAL_KEY missing. Returning demo image.");
     return res.status(200).json({ url: demoImage });
   }
 
@@ -56,27 +80,36 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         prompt,
-        image_size: "square_hd"
+        image_size: "square_hd",
+        num_inference_steps: 30
       })
     });
 
     if (!response.ok) {
-      return res.status(200).json({ url: demoImage });
+      console.error("FAL API error:", response.status);
+      return res.status(response.status).json({
+        error: "Image generation service error"
+      });
     }
 
     const data = await response.json();
 
-    if (data?.images?.[0]?.url) {
-      return res.status(200).json({ url: data.images[0].url });
+    const imageUrl =
+      data?.images?.[0]?.url ||
+      data?.output?.[0]?.url;
+
+    if (!imageUrl) {
+      return res.status(500).json({
+        error: "Image generation failed"
+      });
     }
 
-    if (data?.output?.[0]?.url) {
-      return res.status(200).json({ url: data.output[0].url });
-    }
-
-    return res.status(200).json({ url: demoImage });
+    return res.status(200).json({ url: imageUrl });
 
   } catch (error) {
-    return res.status(200).json({ url: demoImage });
+    console.error("Server error:", error);
+    return res.status(500).json({
+      error: "Internal server error"
+    });
   }
 }
