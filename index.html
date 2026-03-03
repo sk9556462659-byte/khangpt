@@ -14,7 +14,7 @@ button{padding:8px 14px;border:none;border-radius:10px;background:gold;cursor:po
 .generator{text-align:center;padding:20px;}
 .generator input{width:90%;max-width:500px;padding:12px;border:none;border-radius:10px;}
 #result img{margin-top:20px;max-width:90%;border-radius:15px;}
-.usage{font-size:12px;opacity:.7;margin-top:10px;}
+.usage{font-size:14px;opacity:.9;margin-top:10px;}
 </style>
 </head>
 
@@ -34,7 +34,7 @@ button{padding:8px 14px;border:none;border-radius:10px;background:gold;cursor:po
 <div class="generator">
 <input type="text" id="prompt" placeholder="Enter your prompt"><br><br>
 <button id="generateBtn">Generate</button>
-<div class="usage" id="usageText"></div>
+<div class="usage" id="usageText">Credits: 0</div>
 <div id="result"></div>
 </div>
 
@@ -58,58 +58,69 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
 let currentUser = null;
 let userCredits = 0;
 
 /* AUTH LISTENER */
 auth.onAuthStateChanged(async (user) => {
+
   if (user) {
+
     currentUser = user;
-    document.getElementById("userName").innerText = user.displayName || user.email;
+
+    document.getElementById("userName").innerText =
+      user.displayName || user.email;
+
     document.getElementById("loginBtn").style.display = "none";
     document.getElementById("logoutBtn").style.display = "inline-block";
 
     await setupUserData();
 
   } else {
+
     currentUser = null;
     userCredits = 0;
+
     document.getElementById("userName").innerText = "";
     document.getElementById("loginBtn").style.display = "inline-block";
     document.getElementById("logoutBtn").style.display = "none";
+
     updateUsageUI();
   }
 });
 
 /* LOGIN */
-document.getElementById("loginBtn").addEventListener("click", async () => {
+document.getElementById("loginBtn").onclick = async () => {
   const provider = new firebase.auth.GoogleAuthProvider();
   try {
     await auth.signInWithPopup(provider);
   } catch (error) {
     alert(error.message);
   }
-});
+};
 
 /* LOGOUT */
-document.getElementById("logoutBtn").addEventListener("click", () => {
+document.getElementById("logoutBtn").onclick = () => {
   auth.signOut();
-});
+};
 
 /* CREATE OR FETCH USER */
 async function setupUserData(){
+
   const userRef = db.collection("users").doc(currentUser.uid);
   const doc = await userRef.get();
 
   if (!doc.exists) {
+
     await userRef.set({
       credits: 5,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+
     userCredits = 5;
+
   } else {
+
     userCredits = doc.data().credits || 0;
   }
 
@@ -123,9 +134,8 @@ function updateUsageUI(){
 }
 
 /* GENERATE IMAGE */
-document.getElementById("generateBtn").addEventListener("click", generateImage);
+document.getElementById("generateBtn").onclick = async function(){
 
-async function generateImage(){
   const prompt = document.getElementById("prompt").value.trim();
   if(!prompt) return;
 
@@ -140,6 +150,7 @@ async function generateImage(){
   }
 
   try{
+
     const res = await fetch("/api/generate",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -165,7 +176,7 @@ async function generateImage(){
   }catch(err){
     alert("Image generation failed.");
   }
-}
+};
 </script>
 
 </body>
