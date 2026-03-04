@@ -30,6 +30,15 @@ margin-bottom:20px;
 background:#444;
 color:white;
 }
+
+.pages{
+text-align:center;
+margin-top:10px;
+display:flex;
+gap:10px;
+justify-content:center;
+flex-wrap:wrap;
+}
 </style>
 </head>
 
@@ -45,6 +54,18 @@ color:white;
 </div>
 
 <div class="hero"><h1>Create Stunning AI Images</h1></div>
+
+<div class="pages">
+
+<a href="/gallery.html">
+<button>Explore Gallery</button>
+</a>
+
+<a href="/trending.html">
+<button>🔥 Trending</button>
+</a>
+
+</div>
 
 <div class="generator">
 
@@ -257,8 +278,13 @@ return;
 document.getElementById("result").innerHTML=
 
 '<div style="position:relative;display:inline-block;">'+
-'<img src="'+data.url+'">'+
+'<img id="generatedImage" src="'+data.url+'">'+
 '<span style="position:absolute;bottom:10px;right:10px;background:black;color:white;padding:3px 6px;font-size:10px;">KhanGPT</span>'+
+'</div>'+
+
+'<div style="margin-top:15px;">'+
+'<button onclick="downloadImage()">Download</button> '+
+'<button onclick="shareImage()">Share</button>'+
 '</div>';
 
 await db.collection("users")
@@ -286,6 +312,40 @@ alert("Error: "+err.message);
 }
 
 };
+
+function downloadImage(){
+
+const img=document.getElementById("generatedImage").src;
+
+const a=document.createElement("a");
+
+a.href=img;
+
+a.download="khangpt-image.png";
+
+a.click();
+
+}
+
+function shareImage(){
+
+const img=document.getElementById("generatedImage").src;
+
+if(navigator.share){
+
+navigator.share({
+title:"AI Image",
+text:"Created with KhanGPT",
+url:img
+});
+
+}else{
+
+alert("Share not supported on this browser");
+
+}
+
+}
 
 </script>
 
