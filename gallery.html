@@ -25,6 +25,27 @@ width:200px;
 border-radius:10px;
 }
 
+.card{
+background:#1b1738;
+padding:10px;
+border-radius:10px;
+}
+
+button{
+margin-top:5px;
+padding:6px 10px;
+border:none;
+border-radius:6px;
+background:gold;
+cursor:pointer;
+font-weight:bold;
+}
+
+.likes{
+font-size:13px;
+margin-top:4px;
+}
+
 </style>
 
 </head>
@@ -58,17 +79,50 @@ const snap = await db.collectionGroup("images").get();
 
 const gallery = document.getElementById("gallery");
 
+gallery.innerHTML="";
+
 snap.forEach(doc=>{
 
 const data = doc.data();
 
 gallery.innerHTML +=
 
-'<div>'+
+'<div class="card">'+
 '<img src="'+data.imageUrl+'">'+
+'<br>'+
+'<button onclick="likeImage(\''+doc.id+'\')">❤️ Like</button>'+
+'<div class="likes">'+(data.likes || 0)+' Likes</div>'+
 '</div>';
 
 });
+
+}
+
+async function likeImage(id){
+
+try{
+
+const snap = await db.collectionGroup("images").get();
+
+snap.forEach(async(doc)=>{
+
+if(doc.id === id){
+
+await doc.ref.update({
+likes: firebase.firestore.FieldValue.increment(1)
+});
+
+}
+
+});
+
+location.reload();
+
+}catch(e){
+
+alert("Error liking image");
+
+}
 
 }
 
