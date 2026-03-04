@@ -21,9 +21,27 @@ justify-content:center;
 margin-top:30px;
 }
 
+.card{
+background:#1b1738;
+padding:10px;
+border-radius:10px;
+}
+
 img{
 width:200px;
 border-radius:10px;
+}
+
+.likes{
+font-size:13px;
+margin-top:5px;
+color:gold;
+}
+
+.prompt{
+font-size:11px;
+opacity:.7;
+margin-top:5px;
 }
 
 </style>
@@ -55,6 +73,8 @@ loadTrending();
 
 async function loadTrending(){
 
+try{
+
 const snap = await db.collectionGroup("images")
 .orderBy("likes","desc")
 .limit(20)
@@ -62,17 +82,27 @@ const snap = await db.collectionGroup("images")
 
 const gallery = document.getElementById("gallery");
 
+gallery.innerHTML="";
+
 snap.forEach(doc=>{
 
 const data = doc.data();
 
 gallery.innerHTML +=
-'<div>'+
+
+'<div class="card">'+
 '<img src="'+data.imageUrl+'">'+
-'<p>'+ (data.likes || 0) +' ❤️</p>'+
+'<div class="likes">🔥 '+(data.likes || 0)+' Likes</div>'+
+'<div class="prompt">'+(data.prompt || "")+'</div>'+
 '</div>';
 
 });
+
+}catch(e){
+
+document.getElementById("gallery").innerHTML="Error loading trending images";
+
+}
 
 }
 
