@@ -15,8 +15,21 @@ button{padding:8px 14px;border:none;border-radius:10px;background:gold;cursor:po
 .generator input{width:90%;max-width:500px;padding:12px;border:none;border-radius:10px;}
 #result img{margin-top:20px;max-width:90%;border-radius:15px;}
 .usage{font-size:14px;opacity:.9;margin-top:10px;}
+
 .history{display:flex;flex-wrap:wrap;gap:15px;justify-content:center;margin-top:30px;}
 .history img{width:150px;border-radius:10px;}
+
+.templates{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+justify-content:center;
+margin-bottom:20px;
+}
+.templates button{
+background:#444;
+color:white;
+}
 </style>
 </head>
 
@@ -34,13 +47,27 @@ button{padding:8px 14px;border:none;border-radius:10px;background:gold;cursor:po
 <div class="hero"><h1>Create Stunning AI Images</h1></div>
 
 <div class="generator">
+
+<div class="templates">
+<button onclick="setPrompt('Islamic calligraphy golden light mosque background')">Islamic Art</button>
+<button onclick="setPrompt('cute 3D cartoon character pixar style')">Cartoon</button>
+<button onclick="setPrompt('anime character ultra detailed cinematic lighting')">Anime</button>
+<button onclick="setPrompt('youtube thumbnail dramatic lighting ultra hd')">Thumbnail</button>
+<button onclick="setPrompt('realistic product photography studio lighting')">Product</button>
+</div>
+
 <input type="text" id="prompt" placeholder="Enter your prompt"><br><br>
+
 <button id="generateBtn">Generate</button>
+
 <div class="usage" id="usageText">Credits: 0</div>
+
 <div id="result"></div>
 
 <h2 style="margin-top:40px;">My Images</h2>
+
 <div id="history" class="history"></div>
+
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -48,195 +75,218 @@ button{padding:8px 14px;border:none;border-radius:10px;background:gold;cursor:po
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
 <script>
+
+function setPrompt(text){
+document.getElementById("prompt").value=text;
+}
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
-  authDomain: "khangpt-4176b.firebaseapp.com",
-  projectId: "khangpt-4176b",
-  storageBucket: "khangpt-4176b.firebasestorage.app",
-  messagingSenderId: "317363736581",
-  appId: "1:317363736581:web:28441dae26ab4731290c6c"
+apiKey:"AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
+authDomain:"khangpt-4176b.firebaseapp.com",
+projectId:"khangpt-4176b",
+storageBucket:"khangpt-4176b.firebasestorage.app",
+messagingSenderId:"317363736581",
+appId:"1:317363736581:web:28441dae26ab4731290c6c"
 };
 
 firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
-const db = firebase.firestore();
+const auth=firebase.auth();
+const db=firebase.firestore();
 
-let currentUser = null;
-let userCredits = 0;
+let currentUser=null;
+let userCredits=0;
 
-auth.onAuthStateChanged(async (user) => {
+auth.onAuthStateChanged(async(user)=>{
 
-  if (user) {
+if(user){
 
-    currentUser = user;
-    document.getElementById("userName").innerText =
-      user.displayName || user.email;
+currentUser=user;
 
-    document.getElementById("loginBtn").style.display = "none";
-    document.getElementById("logoutBtn").style.display = "inline-block";
+document.getElementById("userName").innerText=
+user.displayName||user.email;
 
-    await setupUserData();
-    loadHistory();
+document.getElementById("loginBtn").style.display="none";
+document.getElementById("logoutBtn").style.display="inline-block";
 
-  } else {
+await setupUserData();
+loadHistory();
 
-    currentUser = null;
-    userCredits = 0;
+}else{
 
-    document.getElementById("userName").innerText = "";
-    document.getElementById("loginBtn").style.display = "inline-block";
-    document.getElementById("logoutBtn").style.display = "none";
+currentUser=null;
+userCredits=0;
 
-    updateUsageUI();
-    document.getElementById("history").innerHTML = "";
-  }
+document.getElementById("userName").innerText="";
+document.getElementById("loginBtn").style.display="inline-block";
+document.getElementById("logoutBtn").style.display="none";
+
+updateUsageUI();
+document.getElementById("history").innerHTML="";
+
+}
+
 });
 
-document.getElementById("loginBtn").onclick = async () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  await auth.signInWithPopup(provider);
+document.getElementById("loginBtn").onclick=async()=>{
+const provider=new firebase.auth.GoogleAuthProvider();
+await auth.signInWithPopup(provider);
 };
 
-document.getElementById("logoutBtn").onclick = () => {
-  auth.signOut();
+document.getElementById("logoutBtn").onclick=()=>{
+auth.signOut();
 };
 
 async function setupUserData(){
 
-  const userRef = db.collection("users").doc(currentUser.uid);
-  const doc = await userRef.get();
+const userRef=db.collection("users").doc(currentUser.uid);
+const doc=await userRef.get();
 
-  const now = Date.now();
-  const oneDay = 24 * 60 * 60 * 1000;
+const now=Date.now();
+const oneDay=24*60*60*1000;
 
-  if (!doc.exists) {
+if(!doc.exists){
 
-    await userRef.set({
-      credits: 5,
-      lastReset: now,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+await userRef.set({
+credits:5,
+lastReset:now,
+createdAt:firebase.firestore.FieldValue.serverTimestamp()
+});
 
-    userCredits = 5;
+userCredits=5;
 
-  } else {
+}else{
 
-    const data = doc.data();
-    const lastReset = data.lastReset || 0;
+const data=doc.data();
+const lastReset=data.lastReset||0;
 
-    if (now - lastReset > oneDay) {
+if(now-lastReset>oneDay){
 
-      await userRef.update({
-        credits: 5,
-        lastReset: now
-      });
+await userRef.update({
+credits:5,
+lastReset:now
+});
 
-      userCredits = 5;
+userCredits=5;
 
-    } else {
+}else{
 
-      userCredits = data.credits || 0;
-    }
-  }
+userCredits=data.credits||0;
 
-  updateUsageUI();
+}
+
+}
+
+updateUsageUI();
+
 }
 
 async function loadHistory(){
 
-  const snap = await db.collection("users")
-    .doc(currentUser.uid)
-    .collection("images")
-    .orderBy("createdAt","desc")
-    .get();
+const snap=await db.collection("users")
+.doc(currentUser.uid)
+.collection("images")
+.orderBy("createdAt","desc")
+.get();
 
-  const historyDiv = document.getElementById("history");
-  historyDiv.innerHTML = "";
+const historyDiv=document.getElementById("history");
 
-  snap.forEach(doc=>{
-    const data = doc.data();
-    historyDiv.innerHTML += `
-      <div>
-        <img src="${data.imageUrl}">
-        <p style="font-size:11px">${data.prompt}</p>
-      </div>
-    `;
-  });
+historyDiv.innerHTML="";
+
+snap.forEach(doc=>{
+
+const data=doc.data();
+
+historyDiv.innerHTML+=`
+<div>
+<img src="${data.imageUrl}">
+<p style="font-size:11px">${data.prompt}</p>
+</div>
+`;
+
+});
+
 }
 
 function updateUsageUI(){
-  document.getElementById("usageText").innerText =
-  "Credits: " + userCredits;
+
+document.getElementById("usageText").innerText=
+"Credits: "+userCredits;
+
 }
 
-document.getElementById("generateBtn").onclick = async function(){
+document.getElementById("generateBtn").onclick=async function(){
 
-  const prompt = document.getElementById("prompt").value.trim();
-  if(!prompt) return;
+const prompt=document.getElementById("prompt").value.trim();
 
-  if(!currentUser){
-    alert("Please login first.");
-    return;
-  }
+if(!prompt)return;
 
-  if(userCredits <= 0){
-    alert("No credits left.");
-    return;
-  }
+if(!currentUser){
 
-  try{
+alert("Please login first.");
+return;
 
-    const res = await fetch("/api/generate",{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ prompt })
-    });
+}
 
-    if(!res.ok){
-      alert("Server error: " + res.status);
-      return;
-    }
+if(userCredits<=0){
 
-    const text = await res.text();
+alert("No credits left.");
+return;
 
-    if(!text){
-      alert("Empty response from server");
-      return;
-    }
+}
 
-    const data = JSON.parse(text);
+document.getElementById("result").innerHTML="<p>Generating image...</p>";
 
-    if(!data.url){
-      alert("Image not returned");
-      return;
-    }
+try{
 
-    document.getElementById("result").innerHTML =
-      '<img src="'+data.url+'">';
+const res=await fetch("/api/generate",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt})
+});
 
-    await db.collection("users")
-      .doc(currentUser.uid)
-      .collection("images")
-      .add({
-        prompt: prompt,
-        imageUrl: data.url,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+const data=await res.json();
 
-    userCredits--;
+if(!data.url){
 
-    await db.collection("users")
-      .doc(currentUser.uid)
-      .update({ credits: userCredits });
+alert("Image generation failed");
+return;
 
-    updateUsageUI();
-    loadHistory();
+}
 
-  }catch(err){
-    alert("Error: " + err.message);
-  }
+document.getElementById("result").innerHTML=
+
+'<div style="position:relative;display:inline-block;">'+
+'<img src="'+data.url+'">'+
+'<span style="position:absolute;bottom:10px;right:10px;background:black;color:white;padding:3px 6px;font-size:10px;">KhanGPT</span>'+
+'</div>';
+
+await db.collection("users")
+.doc(currentUser.uid)
+.collection("images")
+.add({
+prompt:prompt,
+imageUrl:data.url,
+createdAt:firebase.firestore.FieldValue.serverTimestamp()
+});
+
+userCredits--;
+
+await db.collection("users")
+.doc(currentUser.uid)
+.update({credits:userCredits});
+
+updateUsageUI();
+loadHistory();
+
+}catch(err){
+
+alert("Error: "+err.message);
+
+}
+
 };
+
 </script>
 
 </body>
