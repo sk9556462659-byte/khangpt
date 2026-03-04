@@ -14,10 +14,16 @@ text-align:center;
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fill,200px);
+grid-template-columns:repeat(auto-fill,220px);
 gap:20px;
 justify-content:center;
 margin-top:30px;
+}
+
+.card{
+background:#1b1738;
+padding:10px;
+border-radius:10px;
 }
 
 img{
@@ -25,10 +31,10 @@ width:200px;
 border-radius:10px;
 }
 
-.card{
-background:#1b1738;
-padding:10px;
-border-radius:10px;
+.prompt{
+font-size:11px;
+opacity:.7;
+margin-top:6px;
 }
 
 button{
@@ -44,6 +50,7 @@ font-weight:bold;
 .likes{
 font-size:13px;
 margin-top:4px;
+color:gold;
 }
 
 </style>
@@ -89,9 +96,17 @@ gallery.innerHTML +=
 
 '<div class="card">'+
 '<img src="'+data.imageUrl+'">'+
-'<br>'+
-'<button onclick="likeImage(\''+doc.id+'\')">❤️ Like</button>'+
-'<div class="likes">'+(data.likes || 0)+' Likes</div>'+
+
+'<div class="likes">'+(data.likes || 0)+' ❤️</div>'+
+
+'<div class="prompt">'+(data.prompt || "")+'</div>'+
+
+'<button onclick="likeImage(\''+doc.id+'\')">Like</button>'+
+
+'<button onclick="copyPrompt(\''+encodeURIComponent(data.prompt || "")+'\')">Copy Prompt</button>'+
+
+'<button onclick="remixPrompt(\''+encodeURIComponent(data.prompt || "")+'\')">Remix</button>'+
+
 '</div>';
 
 });
@@ -100,13 +115,11 @@ gallery.innerHTML +=
 
 async function likeImage(id){
 
-try{
-
 const snap = await db.collectionGroup("images").get();
 
 snap.forEach(async(doc)=>{
 
-if(doc.id === id){
+if(doc.id===id){
 
 await doc.ref.update({
 likes: firebase.firestore.FieldValue.increment(1)
@@ -118,11 +131,23 @@ likes: firebase.firestore.FieldValue.increment(1)
 
 location.reload();
 
-}catch(e){
+}
 
-alert("Error liking image");
+function copyPrompt(prompt){
+
+const text = decodeURIComponent(prompt);
+
+navigator.clipboard.writeText(text);
+
+alert("Prompt copied!");
 
 }
+
+function remixPrompt(prompt){
+
+const text = decodeURIComponent(prompt);
+
+window.location.href = "/?prompt="+encodeURIComponent(text);
 
 }
 
