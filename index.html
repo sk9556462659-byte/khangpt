@@ -14,10 +14,20 @@ button{padding:8px 14px;border:none;border-radius:10px;background:gold;cursor:po
 .generator{text-align:center;padding:20px;}
 .generator input{width:90%;max-width:500px;padding:12px;border:none;border-radius:10px;}
 #result img{margin-top:20px;max-width:90%;border-radius:15px;}
-.usage{font-size:14px;opacity:.9;margin-top:10px;}
+.usage{font-size:14px;margin-top:10px;}
 
-.history{display:flex;flex-wrap:wrap;gap:15px;justify-content:center;margin-top:30px;}
-.history img{width:150px;border-radius:10px;}
+.history{
+display:flex;
+flex-wrap:wrap;
+gap:15px;
+justify-content:center;
+margin-top:30px;
+}
+
+.history img{
+width:150px;
+border-radius:10px;
+}
 
 .templates{
 display:flex;
@@ -26,6 +36,7 @@ gap:10px;
 justify-content:center;
 margin-bottom:20px;
 }
+
 .templates button{
 background:#444;
 color:white;
@@ -39,21 +50,33 @@ gap:10px;
 justify-content:center;
 flex-wrap:wrap;
 }
+
 </style>
 </head>
 
 <body>
 
 <div class="nav">
-<div class="brand"><h2>KhanGPT</h2></div>
-<div class="right">
-<span id="userName"></span>
-<button id="loginBtn">Login</button>
-<button id="logoutBtn" style="display:none;">Logout</button>
-</div>
+
+<div class="brand">
+<h2>KhanGPT</h2>
 </div>
 
-<div class="hero"><h1>Create Stunning AI Images</h1></div>
+<div class="right">
+
+<span id="userName"></span>
+
+<button id="loginBtn">Login</button>
+
+<button id="logoutBtn" style="display:none;">Logout</button>
+
+</div>
+
+</div>
+
+<div class="hero">
+<h1>Create Stunning AI Images</h1>
+</div>
 
 <div class="pages">
 
@@ -65,19 +88,31 @@ flex-wrap:wrap;
 <button>🔥 Trending</button>
 </a>
 
+<a href="/buy.html">
+<button>💰 Buy Credits</button>
+</a>
+
 </div>
 
 <div class="generator">
 
 <div class="templates">
+
 <button onclick="setPrompt('Islamic calligraphy golden light mosque background')">Islamic Art</button>
+
 <button onclick="setPrompt('cute 3D cartoon character pixar style')">Cartoon</button>
+
 <button onclick="setPrompt('anime character ultra detailed cinematic lighting')">Anime</button>
+
 <button onclick="setPrompt('youtube thumbnail dramatic lighting ultra hd')">Thumbnail</button>
+
 <button onclick="setPrompt('realistic product photography studio lighting')">Product</button>
+
 </div>
 
-<input type="text" id="prompt" placeholder="Enter your prompt"><br><br>
+<input type="text" id="prompt" placeholder="Enter your prompt">
+
+<br><br>
 
 <button id="generateBtn">Generate</button>
 
@@ -218,12 +253,11 @@ snap.forEach(doc=>{
 
 const data=doc.data();
 
-historyDiv.innerHTML+=`
-<div>
-<img src="${data.imageUrl}">
-<p style="font-size:11px">${data.prompt}</p>
-</div>
-`;
+historyDiv.innerHTML+=
+'<div>'+
+'<img src="'+data.imageUrl+'">'+
+'<p style="font-size:11px">'+data.prompt+'</p>'+
+'</div>';
 
 });
 
@@ -251,7 +285,8 @@ return;
 
 if(userCredits<=0){
 
-alert("No credits left.");
+alert("No credits left. Please buy credits.");
+
 return;
 
 }
