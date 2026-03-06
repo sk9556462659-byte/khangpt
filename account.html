@@ -2,7 +2,7 @@
 <html>
 <head>
 
-<title>My Account</title>
+<title>Account</title>
 
 <style>
 
@@ -13,21 +13,8 @@ font-family:Arial;
 text-align:center;
 }
 
-.box{
-background:#1b1738;
-padding:30px;
+.card{
 margin-top:50px;
-display:inline-block;
-border-radius:10px;
-}
-
-button{
-padding:10px 16px;
-border:none;
-border-radius:8px;
-background:gold;
-cursor:pointer;
-font-weight:bold;
 }
 
 </style>
@@ -38,13 +25,11 @@ font-weight:bold;
 
 <h1>My Account</h1>
 
-<div class="box">
+<div class="card">
 
 <p id="email"></p>
 
 <p id="credits"></p>
-
-<button onclick="logout()">Logout</button>
 
 </div>
 
@@ -54,7 +39,7 @@ font-weight:bold;
 
 <script>
 
-const firebaseConfig = {
+const firebaseConfig={
 apiKey:"AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
 authDomain:"khangpt-4176b.firebaseapp.com",
 projectId:"khangpt-4176b"
@@ -67,33 +52,17 @@ const db=firebase.firestore();
 
 auth.onAuthStateChanged(async(user)=>{
 
-if(!user){
+if(!user)return;
 
-location.href="/";
+document.getElementById("email").innerText="Email: "+user.email;
 
-return;
-
-}
-
-document.getElementById("email").innerText=
-"User: "+user.email;
-
-const doc=await db.collection("users")
-.doc(user.uid)
-.get();
+const doc=await db.collection("users").doc(user.uid).get();
 
 document.getElementById("credits").innerText=
-"Credits: "+(doc.data().credits || 0);
+
+"Credits: "+doc.data().credits;
 
 });
-
-function logout(){
-
-auth.signOut();
-
-location.href="/";
-
-}
 
 </script>
 
