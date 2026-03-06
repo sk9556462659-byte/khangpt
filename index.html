@@ -29,10 +29,23 @@ font-weight:bold;
 color:gold;
 }
 
+.menu{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
 .menu a{
-margin-left:15px;
 text-decoration:none;
 color:white;
+}
+
+.menu button{
+background:gold;
+border:none;
+padding:6px 12px;
+border-radius:6px;
+cursor:pointer;
 }
 
 .hero{
@@ -93,44 +106,6 @@ width:150px;
 border-radius:10px;
 }
 
-.features{
-text-align:center;
-padding:60px 20px;
-}
-
-.feature-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:20px;
-margin-top:30px;
-}
-
-.feature{
-background:#1b1738;
-padding:20px;
-border-radius:10px;
-}
-
-.pricing{
-text-align:center;
-padding:60px 20px;
-}
-
-.price-grid{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:20px;
-margin-top:30px;
-}
-
-.plan{
-background:#1b1738;
-padding:20px;
-border-radius:10px;
-width:220px;
-}
-
 .footer{
 text-align:center;
 padding:30px;
@@ -156,6 +131,12 @@ margin-top:40px;
 <a href="trending.html">Trending</a>
 <a href="buy.html">Buy Credits</a>
 <a href="account.html">Account</a>
+
+<span id="userName"></span>
+
+<button id="loginBtn">Login</button>
+
+<button id="logoutBtn" style="display:none;">Logout</button>
 
 </div>
 
@@ -207,64 +188,6 @@ margin-top:40px;
 
 <div id="history" class="history"></div>
 
-<!-- FEATURES -->
-
-<div class="features">
-
-<h2>Features</h2>
-
-<div class="feature-grid">
-
-<div class="feature">⚡ Fast AI generation</div>
-
-<div class="feature">🎨 HD image quality</div>
-
-<div class="feature">📱 Mobile friendly</div>
-
-<div class="feature">🌎 Free daily credits</div>
-
-</div>
-
-</div>
-
-<!-- PRICING -->
-
-<div class="pricing">
-
-<h2>Pricing</h2>
-
-<div class="price-grid">
-
-<div class="plan">
-
-<h3>Free</h3>
-
-<p>5 images per day</p>
-
-</div>
-
-<div class="plan">
-
-<h3>Pro</h3>
-
-<p>200 images/day</p>
-<p>₹399/month</p>
-
-</div>
-
-<div class="plan">
-
-<h3>Premium</h3>
-
-<p>Unlimited images</p>
-<p>₹799/month</p>
-
-</div>
-
-</div>
-
-</div>
-
 <div class="footer">
 
 © 2026 KhanGPT AI
@@ -307,13 +230,42 @@ if(user){
 
 currentUser=user;
 
+document.getElementById("userName").innerText=
+user.displayName || user.email;
+
+document.getElementById("loginBtn").style.display="none";
+document.getElementById("logoutBtn").style.display="inline-block";
+
 await setupUser();
 
 loadHistory();
 
+}else{
+
+currentUser=null;
+
+document.getElementById("userName").innerText="";
+
+document.getElementById("loginBtn").style.display="inline-block";
+document.getElementById("logoutBtn").style.display="none";
+
 }
 
 });
+
+document.getElementById("loginBtn").onclick=async()=>{
+
+const provider=new firebase.auth.GoogleAuthProvider();
+
+await auth.signInWithPopup(provider);
+
+};
+
+document.getElementById("logoutBtn").onclick=()=>{
+
+auth.signOut();
+
+};
 
 async function setupUser(){
 
@@ -356,7 +308,7 @@ if(!prompt)return;
 
 if(!currentUser){
 
-alert("Login first");
+alert("Please login first");
 
 return;
 
