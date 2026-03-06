@@ -15,64 +15,99 @@ background:#0f0c29;
 color:white;
 }
 
-.navbar{
+/* HEADER */
+
+.header{
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:15px 25px;
+padding:15px;
 background:#14113b;
 }
 
 .logo{
-font-size:22px;
-font-weight:bold;
+font-size:20px;
 color:gold;
+font-weight:bold;
 }
 
-.menu a{
-margin-left:15px;
+.menu-btn{
+font-size:22px;
+cursor:pointer;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+position:fixed;
+left:-250px;
+top:0;
+width:250px;
+height:100%;
+background:#1b1738;
+padding:20px;
+transition:.3s;
+}
+
+.sidebar a{
+display:block;
+color:white;
 text-decoration:none;
-color:white;
+margin:15px 0;
 }
 
-.hero{
+.sidebar.open{
+left:0;
+}
+
+/* MAIN */
+
+.main{
+padding:20px;
 text-align:center;
-padding:60px 20px;
 }
 
-.templates{
+/* SUGGESTION BUTTONS */
+
+.suggestions{
 display:flex;
-flex-wrap:wrap;
+flex-direction:column;
 gap:10px;
-justify-content:center;
-margin-bottom:20px;
+margin-top:20px;
 }
 
-.templates button{
-background:#333;
+.suggestions button{
+padding:12px;
+border:none;
+border-radius:20px;
+background:#222;
 color:white;
 }
+
+/* GENERATOR */
 
 .generator{
-text-align:center;
+margin-top:30px;
 }
 
-.generator input{
+input{
 width:90%;
 max-width:500px;
 padding:12px;
-border-radius:8px;
+border-radius:10px;
 border:none;
 }
 
-button{
-padding:10px 16px;
+button.generate{
+margin-top:15px;
+padding:12px 20px;
 border:none;
-border-radius:8px;
+border-radius:10px;
 background:gold;
-cursor:pointer;
 font-weight:bold;
 }
+
+/* RESULT */
 
 #result img{
 margin-top:20px;
@@ -80,17 +115,13 @@ max-width:90%;
 border-radius:10px;
 }
 
-.history{
-display:flex;
-flex-wrap:wrap;
-gap:15px;
-justify-content:center;
-margin-top:30px;
-}
+/* FOOTER */
 
-.history img{
-width:150px;
-border-radius:10px;
+.footer{
+text-align:center;
+padding:20px;
+margin-top:40px;
+background:#14113b;
 }
 
 </style>
@@ -99,115 +130,103 @@ border-radius:10px;
 
 <body>
 
-<div class="navbar">
+<!-- SIDEBAR -->
 
-<div class="logo">KhanGPT</div>
+<div class="sidebar" id="sidebar">
 
-<div class="menu">
+<h3>KhanGPT</h3>
 
+<a href="#">Dashboard</a>
 <a href="gallery.html">Gallery</a>
 <a href="trending.html">Trending</a>
 <a href="buy.html">Buy Credits</a>
 <a href="account.html">Account</a>
 
-<button id="loginBtn">Login</button>
-<button id="logoutBtn" style="display:none;">Logout</button>
+</div>
+
+<!-- HEADER -->
+
+<div class="header">
+
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+
+<div class="logo">KhanGPT AI</div>
+
+<div>👤</div>
 
 </div>
 
+<!-- MAIN -->
+
+<div class="main">
+
+<h2>Hi 👋</h2>
+
+<h1>What would you like to create?</h1>
+
+<!-- SUGGESTIONS -->
+
+<div class="suggestions">
+
+<button onclick="setPrompt('ultra realistic ai art')">
+🖼 Create Image
+</button>
+
+<button onclick="alert('Video generator coming soon')">
+🎬 Create Video (Coming Soon)
+</button>
+
+<button onclick="location.href='gallery.html'">
+🎨 Explore Gallery
+</button>
+
+<button onclick="setPrompt('youtube thumbnail dramatic lighting')">
+⚡ AI Prompt Ideas
+</button>
+
 </div>
 
-<div class="hero">
-
-<h1>Create Stunning AI Images</h1>
-
-<p>Generate thumbnails, posters, anime and AI art instantly</p>
-
-</div>
-
-<div class="templates">
-
-<button onclick="setPrompt('Islamic calligraphy golden light mosque background')">Islamic Art</button>
-
-<button onclick="setPrompt('cute 3D cartoon character pixar style')">Cartoon</button>
-
-<button onclick="setPrompt('anime character ultra detailed cinematic lighting')">Anime</button>
-
-<button onclick="setPrompt('youtube thumbnail dramatic lighting ultra hd')">Thumbnail</button>
-
-</div>
+<!-- GENERATOR -->
 
 <div class="generator">
 
-<input id="prompt" placeholder="Enter your prompt">
+<input id="prompt" placeholder="Describe your image...">
 
-<br><br>
+<br>
 
-<button onclick="generate()">Generate</button>
+<button class="generate" onclick="generate()">
+Generate Image
+</button>
 
-<div id="usageText"></div>
+<p id="credits">Credits: 5</p>
 
 <div id="result"></div>
 
 </div>
 
-<h2 style="text-align:center;margin-top:40px;">My Images</h2>
+</div>
 
-<div id="history" class="history"></div>
+<!-- FOOTER -->
 
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<div class="footer">
+
+© 2026 KhanGPT AI
+
+</div>
 
 <script>
 
-const firebaseConfig = {
-apiKey:"AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
-authDomain:"khangpt-4176b.firebaseapp.com",
-projectId:"khangpt-4176b"
-};
+/* SIDEBAR */
 
-firebase.initializeApp(firebaseConfig);
+function toggleMenu(){
 
-const auth=firebase.auth();
-const db=firebase.firestore();
+const menu=document.getElementById("sidebar");
 
-let currentUser=null;
-let userCredits=0;
-
-document.getElementById("loginBtn").onclick=async()=>{
-
-const provider=new firebase.auth.GoogleAuthProvider();
-await auth.signInWithPopup(provider);
-
-};
-
-document.getElementById("logoutBtn").onclick=()=>{
-
-auth.signOut();
-
-};
-
-auth.onAuthStateChanged(async(user)=>{
-
-if(user){
-
-currentUser=user;
-
-document.getElementById("loginBtn").style.display="none";
-document.getElementById("logoutBtn").style.display="inline-block";
-
-await setupUser();
-loadHistory();
-
-}else{
-
-document.getElementById("loginBtn").style.display="inline-block";
-document.getElementById("logoutBtn").style.display="none";
+menu.classList.toggle("open");
 
 }
 
-});
+/* SET PROMPT */
 
 function setPrompt(text){
 
@@ -215,53 +234,16 @@ document.getElementById("prompt").value=text;
 
 }
 
-async function setupUser(){
-
-const ref=db.collection("users").doc(currentUser.uid);
-
-const doc=await ref.get();
-
-if(!doc.exists){
-
-await ref.set({
-
-credits:5,
-createdAt:Date.now()
-
-});
-
-userCredits=5;
-
-}else{
-
-userCredits=doc.data().credits || 0;
-
-}
-
-updateUI();
-
-}
-
-function updateUI(){
-
-document.getElementById("usageText").innerText="Credits: "+userCredits;
-
-}
+/* GENERATE IMAGE */
 
 async function generate(){
 
 const prompt=document.getElementById("prompt").value;
 
-if(!currentUser){
+if(!prompt){
 
-alert("Login first");
-return;
+alert("Enter prompt");
 
-}
-
-if(userCredits<=0){
-
-alert("No credits left");
 return;
 
 }
@@ -271,7 +253,11 @@ document.getElementById("result").innerHTML="Generating...";
 const res=await fetch("/api/generate",{
 
 method:"POST",
-headers:{"Content-Type":"application/json"},
+
+headers:{
+"Content-Type":"application/json"
+},
+
 body:JSON.stringify({prompt})
 
 });
@@ -281,59 +267,6 @@ const data=await res.json();
 document.getElementById("result").innerHTML=
 
 '<img src="'+data.url+'">';
-
-await db.collection("users")
-
-.doc(currentUser.uid)
-
-.collection("images")
-
-.add({
-
-prompt:prompt,
-imageUrl:data.url,
-createdAt:Date.now()
-
-});
-
-userCredits--;
-
-await db.collection("users")
-
-.doc(currentUser.uid)
-
-.update({credits:userCredits});
-
-updateUI();
-loadHistory();
-
-}
-
-async function loadHistory(){
-
-const snap=await db.collection("users")
-
-.doc(currentUser.uid)
-
-.collection("images")
-
-.orderBy("createdAt","desc")
-
-.get();
-
-const history=document.getElementById("history");
-
-history.innerHTML="";
-
-snap.forEach(doc=>{
-
-const data=doc.data();
-
-history.innerHTML+=
-
-'<div><img src="'+data.imageUrl+'"></div>';
-
-});
 
 }
 
