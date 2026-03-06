@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>AI Prompt Library</title>
+
+<style>
+
+body{
+background:#0f0c29;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,250px);
+gap:20px;
+justify-content:center;
+margin-top:30px;
+}
+
+.card{
+background:#1b1738;
+padding:20px;
+border-radius:10px;
+}
+
+button{
+background:gold;
+border:none;
+padding:8px 12px;
+border-radius:6px;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>AI Prompt Library</h1>
+
+<div class="grid">
+
+<div class="card">
+
+<p>3D Pixar Cartoon Character</p>
+
+<button onclick="copy('cute 3D cartoon character pixar style ultra detailed')">
+Copy Prompt
+</button>
+
+</div>
+
+<div class="card">
+
+<p>Islamic Golden Calligraphy</p>
+
+<button onclick="copy('golden islamic calligraphy mosque background glowing light')">
+Copy Prompt
+</button>
+
+</div>
+
+<div class="card">
+
+<p>Anime Character</p>
+
+<button onclick="copy('anime character ultra detailed cinematic lighting')">
+Copy Prompt
+</button>
+
+</div>
+
+<div class="card">
+
+<p>YouTube Thumbnail</p>
+
+<button onclick="copy('youtube thumbnail dramatic lighting ultra hd')">
+Copy Prompt
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+function copy(text){
+
+navigator.clipboard.writeText(text);
+
+alert("Prompt copied");
+
+}
+
+</script>
+
+</body>
+</html>
