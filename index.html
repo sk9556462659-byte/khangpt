@@ -29,23 +29,10 @@ font-weight:bold;
 color:gold;
 }
 
-.menu{
-display:flex;
-align-items:center;
-gap:12px;
-}
-
 .menu a{
+margin-left:15px;
 text-decoration:none;
 color:white;
-}
-
-.menu button{
-background:gold;
-border:none;
-padding:6px 12px;
-border-radius:6px;
-cursor:pointer;
 }
 
 .hero{
@@ -106,20 +93,11 @@ width:150px;
 border-radius:10px;
 }
 
-.footer{
-text-align:center;
-padding:30px;
-background:#14113b;
-margin-top:40px;
-}
-
 </style>
 
 </head>
 
 <body>
-
-<!-- NAVBAR -->
 
 <div class="navbar">
 
@@ -132,27 +110,20 @@ margin-top:40px;
 <a href="buy.html">Buy Credits</a>
 <a href="account.html">Account</a>
 
-<span id="userName"></span>
-
 <button id="loginBtn">Login</button>
-
 <button id="logoutBtn" style="display:none;">Logout</button>
 
 </div>
 
 </div>
 
-<!-- HERO -->
-
 <div class="hero">
 
 <h1>Create Stunning AI Images</h1>
 
-<p>Generate thumbnails, anime, posters and AI art instantly</p>
+<p>Generate thumbnails, posters, anime and AI art instantly</p>
 
 </div>
-
-<!-- PROMPT TEMPLATES -->
 
 <div class="templates">
 
@@ -164,11 +135,7 @@ margin-top:40px;
 
 <button onclick="setPrompt('youtube thumbnail dramatic lighting ultra hd')">Thumbnail</button>
 
-<button onclick="setPrompt('realistic product photography studio lighting')">Product</button>
-
 </div>
-
-<!-- GENERATOR -->
 
 <div class="generator">
 
@@ -188,14 +155,6 @@ margin-top:40px;
 
 <div id="history" class="history"></div>
 
-<div class="footer">
-
-© 2026 KhanGPT AI
-
-</div>
-
-<!-- FIREBASE -->
-
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -203,11 +162,9 @@ margin-top:40px;
 <script>
 
 const firebaseConfig = {
-
 apiKey:"AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
 authDomain:"khangpt-4176b.firebaseapp.com",
 projectId:"khangpt-4176b"
-
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -218,45 +175,9 @@ const db=firebase.firestore();
 let currentUser=null;
 let userCredits=0;
 
-function setPrompt(text){
-
-document.getElementById("prompt").value=text;
-
-}
-
-auth.onAuthStateChanged(async(user)=>{
-
-if(user){
-
-currentUser=user;
-
-document.getElementById("userName").innerText=
-user.displayName || user.email;
-
-document.getElementById("loginBtn").style.display="none";
-document.getElementById("logoutBtn").style.display="inline-block";
-
-await setupUser();
-
-loadHistory();
-
-}else{
-
-currentUser=null;
-
-document.getElementById("userName").innerText="";
-
-document.getElementById("loginBtn").style.display="inline-block";
-document.getElementById("logoutBtn").style.display="none";
-
-}
-
-});
-
 document.getElementById("loginBtn").onclick=async()=>{
 
 const provider=new firebase.auth.GoogleAuthProvider();
-
 await auth.signInWithPopup(provider);
 
 };
@@ -266,6 +187,33 @@ document.getElementById("logoutBtn").onclick=()=>{
 auth.signOut();
 
 };
+
+auth.onAuthStateChanged(async(user)=>{
+
+if(user){
+
+currentUser=user;
+
+document.getElementById("loginBtn").style.display="none";
+document.getElementById("logoutBtn").style.display="inline-block";
+
+await setupUser();
+loadHistory();
+
+}else{
+
+document.getElementById("loginBtn").style.display="inline-block";
+document.getElementById("logoutBtn").style.display="none";
+
+}
+
+});
+
+function setPrompt(text){
+
+document.getElementById("prompt").value=text;
+
+}
 
 async function setupUser(){
 
@@ -302,14 +250,11 @@ document.getElementById("usageText").innerText="Credits: "+userCredits;
 
 async function generate(){
 
-const prompt=document.getElementById("prompt").value.trim();
-
-if(!prompt)return;
+const prompt=document.getElementById("prompt").value;
 
 if(!currentUser){
 
-alert("Please login first");
-
+alert("Login first");
 return;
 
 }
@@ -317,7 +262,6 @@ return;
 if(userCredits<=0){
 
 alert("No credits left");
-
 return;
 
 }
@@ -327,13 +271,7 @@ document.getElementById("result").innerHTML="Generating...";
 const res=await fetch("/api/generate",{
 
 method:"POST",
-
-headers:{
-
-"Content-Type":"application/json"
-
-},
-
+headers:{"Content-Type":"application/json"},
 body:JSON.stringify({prompt})
 
 });
@@ -353,9 +291,7 @@ await db.collection("users")
 .add({
 
 prompt:prompt,
-
 imageUrl:data.url,
-
 createdAt:Date.now()
 
 });
@@ -369,7 +305,6 @@ await db.collection("users")
 .update({credits:userCredits});
 
 updateUI();
-
 loadHistory();
 
 }
