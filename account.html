@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>My Account</title>
+
+<style>
+
+body{
+background:#0f0c29;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+.box{
+background:#1b1738;
+padding:30px;
+margin-top:50px;
+display:inline-block;
+border-radius:10px;
+}
+
+button{
+padding:10px 16px;
+border:none;
+border-radius:8px;
+background:gold;
+cursor:pointer;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>My Account</h1>
+
+<div class="box">
+
+<p id="email"></p>
+
+<p id="credits"></p>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+
+const firebaseConfig = {
+apiKey:"AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
+authDomain:"khangpt-4176b.firebaseapp.com",
+projectId:"khangpt-4176b"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+auth.onAuthStateChanged(async(user)=>{
+
+if(!user){
+
+location.href="/";
+
+return;
+
+}
+
+document.getElementById("email").innerText=
+"User: "+user.email;
+
+const doc=await db.collection("users")
+.doc(user.uid)
+.get();
+
+document.getElementById("credits").innerText=
+"Credits: "+(doc.data().credits || 0);
+
+});
+
+function logout(){
+
+auth.signOut();
+
+location.href="/";
+
+}
+
+</script>
+
+</body>
+</html>
