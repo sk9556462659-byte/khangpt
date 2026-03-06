@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>KhanGPT Dashboard</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#0f0c29;
+color:white;
+display:flex;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+width:220px;
+background:#14113b;
+height:100vh;
+padding:20px;
+position:fixed;
+}
+
+.sidebar h2{
+color:gold;
+}
+
+.sidebar a{
+display:block;
+color:white;
+text-decoration:none;
+margin-top:15px;
+}
+
+.sidebar a:hover{
+color:gold;
+}
+
+/* MAIN */
+
+.main{
+margin-left:240px;
+padding:30px;
+width:100%;
+}
+
+/* GENERATOR */
+
+input{
+width:90%;
+max-width:500px;
+padding:12px;
+border-radius:8px;
+border:none;
+}
+
+button{
+padding:10px 16px;
+border:none;
+border-radius:8px;
+background:gold;
+cursor:pointer;
+font-weight:bold;
+}
+
+.templates{
+margin-bottom:20px;
+}
+
+.templates button{
+background:#333;
+color:white;
+margin:5px;
+}
+
+#result img{
+margin-top:20px;
+max-width:90%;
+border-radius:10px;
+}
+
+.history{
+display:flex;
+flex-wrap:wrap;
+gap:15px;
+margin-top:30px;
+}
+
+.history img{
+width:150px;
+border-radius:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+<h2>KhanGPT</h2>
+
+<a href="dashboard.html">Generate</a>
+
+<a href="gallery.html">Gallery</a>
+
+<a href="trending.html">Trending</a>
+
+<a href="buy.html">Buy Credits</a>
+
+<a href="account.html">Account</a>
+
+<br>
+
+<button id="loginBtn">Login</button>
+
+<button id="logoutBtn" style="display:none;">Logout</button>
+
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+<h1>AI Image Generator</h1>
+
+<div class="templates">
+
+<button onclick="setPrompt('Islamic calligraphy golden mosque background')">
+Islamic
+</button>
+
+<button onclick="setPrompt('cute 3D cartoon pixar style character')">
+Cartoon
+</button>
+
+<button onclick="setPrompt('anime character ultra detailed cinematic lighting')">
+Anime
+</button>
+
+<button onclick="setPrompt('youtube thumbnail dramatic lighting ultra hd')">
+Thumbnail
+</button>
+
+</div>
+
+<input id="prompt" placeholder="Enter prompt">
+
+<br><br>
+
+<button onclick="generate()">Generate</button>
+
+<p id="usageText"></p>
+
+<div id="result"></div>
+
+<h2>My Images</h2>
+
+<div id="history" class="history"></div>
+
+</div>
+
+<!-- FIREBASE -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+
+const firebaseConfig={
+apiKey:"AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
+authDomain:"khangpt-4176b.firebaseapp.com",
+projectId:"khangpt-4176b"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+let currentUser=null;
+let userCredits=0;
+
+document.getElementById("loginBtn").onclick=async()=>{
+
+const provider=new firebase.auth.GoogleAuthProvider();
+await auth.signInWithPopup(provider);
+
+};
+
+document.getElementById("logoutBtn").onclick=()=>{
+
+auth.signOut();
+
+};
+
+auth.onAuthStateChanged(async(user)=>{
+
+if(user){
+
+currentUser=user;
+
+document.getElementById("loginBtn").style.display="none";
+document.getElementById("logoutBtn").style.display="inline-block";
+
+await setupUser();
+loadHistory();
+
+}
+
+});
+
+function setPrompt(text){
+
+document.getElementById("prompt").value=text;
+
+}
+
+async function setupUser(){
+
+const ref=db.collection("users").doc(currentUser.uid);
+
+const doc=await ref.get();
+
+if(!doc.exists){
+
+await ref.set({
+
+credits:5,
+createdAt:Date.now()
+
+});
+
+userCredits=5;
+
+}else{
+
+userCredits=doc.data().credits||0;
+
+}
+
+updateUI();
+
+}
+
+function updateUI(){
+
+document.getElementById("usageText").innerText="Credits: "+userCredits;
+
+}
+
+async function generate(){
+
+const prompt=document.getElementById("prompt").value;
+
+if(!currentUser){
+
+alert("Login first");
+return;
+
+}
+
+if(userCredits<=0){
+
+alert("No credits left");
+return;
+
+}
+
+document.getElementById("result").innerHTML="Generating...";
+
+const res=await fetch("/api/generate",{
+
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt})
+
+});
+
+const data=await res.json();
+
+document.getElementById("result").innerHTML=
+
+'<img src="'+data.url+'">';
+
+await db.collection("users")
+
+.doc(currentUser.uid)
+
+.collection("images")
+
+.add({
+
+prompt:prompt,
+imageUrl:data.url,
+createdAt:Date.now()
+
+});
+
+userCredits--;
+
+await db.collection("users")
+
+.doc(currentUser.uid)
+
+.update({credits:userCredits});
+
+updateUI();
+
+loadHistory();
+
+}
+
+async function loadHistory(){
+
+const snap=await db.collection("users")
+
+.doc(currentUser.uid)
+
+.collection("images")
+
+.orderBy("createdAt","desc")
+
+.get();
+
+const history=document.getElementById("history");
+
+history.innerHTML="";
+
+snap.forEach(doc=>{
+
+const data=doc.data();
+
+history.innerHTML+=
+
+'<div><img src="'+data.imageUrl+'"></div>';
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
