@@ -3,7 +3,6 @@
 <head>
 
 <title>KhanGPT AI</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -23,15 +22,17 @@ justify-content:space-between;
 align-items:center;
 padding:15px;
 background:#14113b;
+position:sticky;
+top:0;
 }
 
 .logo{
-font-size:20px;
 color:gold;
 font-weight:bold;
+font-size:18px;
 }
 
-.menu-btn{
+.menu{
 font-size:22px;
 cursor:pointer;
 }
@@ -40,13 +41,18 @@ cursor:pointer;
 
 .sidebar{
 position:fixed;
-left:-250px;
 top:0;
-width:250px;
+left:-260px;
+width:260px;
 height:100%;
 background:#1b1738;
 padding:20px;
 transition:.3s;
+z-index:10;
+}
+
+.sidebar.open{
+left:0;
 }
 
 .sidebar a{
@@ -56,55 +62,27 @@ text-decoration:none;
 margin:15px 0;
 }
 
-.sidebar.open{
-left:0;
-}
-
 /* MAIN */
 
 .main{
-padding:20px;
+padding:25px;
 text-align:center;
 }
 
-/* SUGGESTION BUTTONS */
+/* SUGGESTION CARDS */
 
-.suggestions{
+.cards{
 display:flex;
 flex-direction:column;
-gap:10px;
+gap:12px;
 margin-top:20px;
 }
 
-.suggestions button{
-padding:12px;
-border:none;
-border-radius:20px;
-background:#222;
-color:white;
-}
-
-/* GENERATOR */
-
-.generator{
-margin-top:30px;
-}
-
-input{
-width:90%;
-max-width:500px;
-padding:12px;
-border-radius:10px;
-border:none;
-}
-
-button.generate{
-margin-top:15px;
-padding:12px 20px;
-border:none;
-border-radius:10px;
-background:gold;
-font-weight:bold;
+.card{
+background:#1b1738;
+padding:14px;
+border-radius:25px;
+cursor:pointer;
 }
 
 /* RESULT */
@@ -112,16 +90,40 @@ font-weight:bold;
 #result img{
 margin-top:20px;
 max-width:90%;
+border-radius:12px;
+}
+
+/* BOTTOM BAR */
+
+.bottom{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+background:#14113b;
+padding:12px;
+display:flex;
+gap:8px;
+}
+
+.bottom input{
+flex:1;
+padding:10px;
+border:none;
 border-radius:10px;
 }
 
-/* FOOTER */
+.bottom button{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+background:gold;
+font-weight:bold;
+}
 
 .footer{
 text-align:center;
-padding:20px;
-margin-top:40px;
-background:#14113b;
+padding:40px 10px;
 }
 
 </style>
@@ -148,7 +150,7 @@ background:#14113b;
 
 <div class="header">
 
-<div class="menu-btn" onclick="toggleMenu()">☰</div>
+<div class="menu" onclick="toggleMenu()">☰</div>
 
 <div class="logo">KhanGPT AI</div>
 
@@ -164,53 +166,45 @@ background:#14113b;
 
 <h1>What would you like to create?</h1>
 
-<!-- SUGGESTIONS -->
+<div class="cards">
 
-<div class="suggestions">
-
-<button onclick="setPrompt('ultra realistic ai art')">
+<div class="card" onclick="setPrompt('ultra realistic ai art')">
 🖼 Create Image
-</button>
-
-<button onclick="alert('Video generator coming soon')">
-🎬 Create Video (Coming Soon)
-</button>
-
-<button onclick="location.href='gallery.html'">
-🎨 Explore Gallery
-</button>
-
-<button onclick="setPrompt('youtube thumbnail dramatic lighting')">
-⚡ AI Prompt Ideas
-</button>
-
 </div>
 
-<!-- GENERATOR -->
+<div class="card" onclick="alert('Video generator coming soon')">
+🎬 Create Video (Coming Soon)
+</div>
 
-<div class="generator">
+<div class="card" onclick="location.href='gallery.html'">
+🎨 Explore Gallery
+</div>
 
-<input id="prompt" placeholder="Describe your image...">
+<div class="card" onclick="setPrompt('youtube thumbnail dramatic lighting ultra hd')">
+⚡ AI Prompt Ideas
+</div>
 
-<br>
-
-<button class="generate" onclick="generate()">
-Generate Image
-</button>
-
-<p id="credits">Credits: 5</p>
+</div>
 
 <div id="result"></div>
 
-</div>
-
-</div>
-
-<!-- FOOTER -->
-
 <div class="footer">
 
-© 2026 KhanGPT AI
+<p>Credits: 5</p>
+
+</div>
+
+</div>
+
+<!-- BOTTOM GENERATOR BAR -->
+
+<div class="bottom">
+
+<button onclick="upload()">+</button>
+
+<input id="prompt" placeholder="Describe your image...">
+
+<button onclick="generate()">Generate</button>
 
 </div>
 
@@ -220,13 +214,11 @@ Generate Image
 
 function toggleMenu(){
 
-const menu=document.getElementById("sidebar");
-
-menu.classList.toggle("open");
+document.getElementById("sidebar").classList.toggle("open");
 
 }
 
-/* SET PROMPT */
+/* PROMPT */
 
 function setPrompt(text){
 
@@ -234,7 +226,15 @@ document.getElementById("prompt").value=text;
 
 }
 
-/* GENERATE IMAGE */
+/* UPLOAD */
+
+function upload(){
+
+alert("Upload feature coming soon");
+
+}
+
+/* GENERATE */
 
 async function generate(){
 
