@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KhanGPT AI - Ultimate AI Assistant</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>KhanGPT AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -12,54 +12,11 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #6366f1;
-            --secondary: #8b5cf6;
-            --accent: #f59e0b;
-            --bg-dark: #0f0a1f;
-            --bg-card: rgba(255, 255, 255, 0.05);
-            --text-primary: #ffffff;
-            --text-secondary: #a1a1aa;
-            --glass: rgba(255, 255, 255, 0.1);
-            --border: rgba(255, 255, 255, 0.1);
-        }
-
-        .light-mode {
-            --bg-dark: #f8fafc;
-            --bg-card: rgba(255, 255, 255, 0.8);
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --glass: rgba(255, 255, 255, 0.5);
-            --border: rgba(0, 0, 0, 0.1);
-        }
-
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: white;
             min-height: 100vh;
-            overflow-x: hidden;
-            transition: all 0.3s ease;
-        }
-
-        /* Animated Background */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.1) 0%, transparent 40%);
-            animation: bgPulse 10s ease-in-out infinite;
-        }
-
-        @keyframes bgPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
         }
 
         /* Header */
@@ -68,144 +25,57 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 70px;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
+            height: 60px;
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 15px;
             z-index: 1000;
-        }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .menu-btn {
             width: 40px;
             height: 40px;
+            border: none;
+            background: rgba(255,255,255,0.1);
+            color: white;
             border-radius: 10px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
             font-size: 18px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .menu-btn:hover {
-            background: var(--primary);
-            transform: scale(1.05);
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #f59e0b, #ef4444);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logo i {
-            background: linear-gradient(135deg, var(--accent), #f97316);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .theme-toggle, .voice-toggle {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .theme-toggle:hover, .voice-toggle:hover {
-            background: var(--primary);
-            transform: rotate(180deg);
-        }
-
-        .voice-toggle.active {
-            background: #10b981;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
         }
 
         .login-btn {
-            padding: 10px 20px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 8px 16px;
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
             border: none;
             color: white;
-            font-weight: 600;
+            border-radius: 20px;
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 5px 15px;
-            background: var(--bg-card);
-            border-radius: 25px;
-            border: 1px solid var(--border);
-        }
-
-        .user-info img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
         }
 
         /* Sidebar */
         .sidebar {
             position: fixed;
-            top: 70px;
-            left: -300px;
+            top: 60px;
+            left: -280px;
             width: 280px;
-            height: calc(100% - 70px);
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid var(--border);
-            padding: 20px;
-            transition: left 0.3s ease;
+            height: calc(100% - 60px);
+            background: rgba(20, 20, 30, 0.98);
+            transition: left 0.3s;
             z-index: 999;
+            padding: 20px;
             overflow-y: auto;
         }
 
@@ -213,212 +83,152 @@
             left: 0;
         }
 
-        .sidebar-section {
-            margin-bottom: 25px;
-        }
-
-        .sidebar-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-            padding-left: 10px;
-        }
-
         .sidebar-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 15px;
+            padding: 15px;
+            margin-bottom: 10px;
             border-radius: 12px;
-            color: var(--text-primary);
+            color: white;
             text-decoration: none;
-            margin-bottom: 5px;
-            transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
             cursor: pointer;
         }
 
-        .sidebar-item:hover, .sidebar-item.active {
-            background: var(--primary);
-            transform: translateX(5px);
-        }
-
-        .sidebar-item i {
-            width: 20px;
-            text-align: center;
+        .sidebar-item:hover {
+            background: rgba(99, 102, 241, 0.3);
         }
 
         .credits-box {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
             padding: 20px;
             border-radius: 16px;
-            margin-top: 20px;
             text-align: center;
+            margin-top: 20px;
         }
 
-        .credits-box h4 {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-
-        .credits-box .credits-count {
-            font-size: 32px;
-            font-weight: 800;
+        .credits-count {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
         }
 
         /* Main Content */
         .main {
-            margin-top: 70px;
-            margin-left: 0;
+            margin-top: 60px;
             padding: 20px;
-            min-height: calc(100vh - 70px);
-            transition: margin-left 0.3s;
+            padding-bottom: 100px;
         }
 
-        .main.sidebar-open {
-            margin-left: 280px;
-        }
-
-        /* Mode Selection */
-        .mode-selector {
+        /* Mode Tabs */
+        .mode-tabs {
             display: flex;
             gap: 10px;
             margin-bottom: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
+            overflow-x: auto;
+            padding-bottom: 10px;
         }
 
-        .mode-btn {
+        .mode-tab {
             padding: 12px 24px;
             border-radius: 25px;
-            border: 2px solid var(--border);
-            background: var(--bg-card);
-            color: var(--text-primary);
+            border: 2px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: white;
             font-size: 14px;
-            font-weight: 600;
             cursor: pointer;
+            white-space: nowrap;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.3s;
         }
 
-        .mode-btn:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .mode-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        .mode-tab.active {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
             border-color: transparent;
-            color: white;
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
         }
 
-        /* Chat Container */
-        .chat-container {
-            max-width: 900px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 250px);
-        }
-
-        .welcome-screen {
+        /* Welcome Screen */
+        .welcome {
             text-align: center;
             padding: 40px 20px;
-            animation: fadeIn 0.5s;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .welcome-screen h1 {
-            font-size: 48px;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+        .welcome h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #f59e0b, #ef4444);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .welcome-screen p {
-            font-size: 18px;
-            color: var(--text-secondary);
-            margin-bottom: 40px;
+        .welcome p {
+            color: #888;
+            margin-bottom: 30px;
         }
 
-        .quick-actions {
+        /* Quick Cards */
+        .quick-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
-            max-width: 800px;
-            margin: 0 auto;
+            margin-bottom: 30px;
         }
 
         .quick-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 16px;
             padding: 20px;
+            text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
-            text-align: left;
+            transition: transform 0.2s;
         }
 
-        .quick-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        .quick-card:active {
+            transform: scale(0.98);
         }
 
         .quick-card i {
-            font-size: 24px;
+            font-size: 28px;
             margin-bottom: 10px;
-            color: var(--primary);
+            color: #6366f1;
         }
 
         .quick-card h3 {
-            font-size: 16px;
+            font-size: 14px;
             margin-bottom: 5px;
         }
 
         .quick-card p {
-            font-size: 13px;
-            color: var(--text-secondary);
+            font-size: 12px;
+            color: #666;
             margin: 0;
         }
 
-        /* Messages Area */
-        .messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
+        /* Chat Area */
+        .chat-box {
             display: none;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .message {
             display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            animation: slideIn 0.3s;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
+            gap: 10px;
+            max-width: 85%;
         }
 
         .message.user {
+            margin-left: auto;
             flex-direction: row-reverse;
         }
 
-        .message-avatar {
-            width: 40px;
-            height: 40px;
+        .msg-avatar {
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -427,54 +237,30 @@
             flex-shrink: 0;
         }
 
-        .message.ai .message-avatar {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        .message.ai .msg-avatar {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
         }
 
-        .message.user .message-avatar {
-            background: linear-gradient(135deg, var(--accent), #f97316);
+        .message.user .msg-avatar {
+            background: linear-gradient(45deg, #f59e0b, #ef4444);
         }
 
-        .message-content {
-            max-width: 70%;
-            padding: 15px 20px;
-            border-radius: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            line-height: 1.6;
+        .msg-content {
+            background: rgba(255,255,255,0.1);
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.5;
+            font-size: 15px;
         }
 
-        .message.user .message-content {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+        .message.user .msg-content {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
         }
 
-        .message-image {
+        .msg-image {
             max-width: 100%;
             border-radius: 12px;
             margin-top: 10px;
-        }
-
-        .typing-indicator {
-            display: flex;
-            gap: 5px;
-            padding: 20px;
-        }
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
         }
 
         /* Input Area */
@@ -483,273 +269,410 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
-            padding: 20px;
-            z-index: 100;
+            background: rgba(20, 20, 30, 0.98);
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
-        .input-container {
-            max-width: 900px;
-            margin: 0 auto;
+        .input-box {
             display: flex;
             gap: 10px;
             align-items: flex-end;
-        }
-
-        .input-wrapper {
-            flex: 1;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.1);
             border-radius: 25px;
             padding: 5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
         }
 
-        .input-wrapper:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .attach-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .attach-btn:hover {
-            background: var(--glass);
-            color: var(--primary);
-        }
-
-        #messageInput {
+        #userInput {
             flex: 1;
             background: transparent;
             border: none;
-            color: var(--text-primary);
+            color: white;
+            padding: 12px 15px;
             font-size: 16px;
-            padding: 10px;
             outline: none;
             resize: none;
-            max-height: 150px;
-            min-height: 40px;
+            max-height: 100px;
         }
 
-        #messageInput::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .mic-btn {
-            width: 40px;
-            height: 40px;
+        .input-btn {
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             border: none;
-            background: transparent;
-            color: var(--text-secondary);
+            background: rgba(255,255,255,0.1);
+            color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
         }
 
-        .mic-btn:hover {
-            background: var(--glass);
-            color: #ef4444;
+        .send-btn {
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
         }
 
         .mic-btn.recording {
             background: #ef4444;
-            color: white;
             animation: pulse 1.5s infinite;
         }
 
-        .send-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: none;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
         }
 
-        .send-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
-        }
-
-        .input-hint {
-            text-align: center;
-            margin-top: 10px;
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        /* Gallery Grid */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .gallery-item {
-            position: relative;
-            border-radius: 16px;
-            overflow: hidden;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            transition: all 0.3s;
-        }
-
-        .gallery-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-
-        .gallery-item img, .gallery-item video {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .gallery-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 15px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-        }
-
-        /* Modal */
-        .modal {
+        /* Loading */
+        .loading {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
+            text-align: center;
             padding: 20px;
         }
 
-        .modal.active {
-            display: flex;
+        .loading.active {
+            display: block;
         }
 
-        .modal-content {
-            background: var(--bg-card);
-            border-radius: 20px;
-            max-width: 900px;
-            width: 100%;
-            max-height: 90vh;
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-close {
+        .spinner {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
-            border: none;
-            background: var(--glass);
-            color: var(--text-primary);
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .modal-body {
-            padding: 20px;
-            overflow-y: auto;
-            max-height: calc(90vh - 80px);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main.sidebar-open {
-                margin-left: 0;
-            }
-            
-            .welcome-screen h1 {
-                font-size: 32px;
-            }
-            
-            .message-content {
-                max-width: 85%;
-            }
-            
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
-
-        /* Loading Animation */
-        .loader {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--border);
-            border-top-color: var(--primary);
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #6366f1;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
+            margin: 0 auto 10px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* Toast Notification */
+        /* Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Toast */
         .toast {
             position: fixed;
-            top: 90px;
-            right: 20px;
-            background: var(--bg-card);
-            border: 1px solid var
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        .toast.success {
+            background: #10b981;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <button class="menu-btn" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo">⚡ KhanGPT</div>
+        <button class="login-btn" id="loginBtn" onclick="login()">
+            <i class="fas fa-user"></i> Login
+        </button>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-item" onclick="switchMode('chat')">
+            <i class="fas fa-comments"></i> AI Chat
+        </div>
+        <div class="sidebar-item" onclick="switchMode('image')">
+            <i class="fas fa-image"></i> Create Image
+        </div>
+        <div class="sidebar-item" onclick="switchMode('video')">
+            <i class="fas fa-video"></i> Create Video
+        </div>
+        <div class="sidebar-item" onclick="showToast('Coming soon!')">
+            <i class="fas fa-history"></i> History
+        </div>
+        <div class="sidebar-item" onclick="showToast('Coming soon!')">
+            <i class="fas fa-cog"></i> Settings
+        </div>
+        
+        <div class="credits-box">
+            <div>Available Credits</div>
+            <div class="credits-count" id="creditsDisplay">0</div>
+            <button class="login-btn" onclick="showToast('Buy credits - Coming soon!')">
+                Buy More
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <!-- Mode Tabs -->
+        <div class="mode-tabs">
+            <button class="mode-tab active" onclick="switchMode('chat')" data-mode="chat">
+                <i class="fas fa-comments"></i> Chat
+            </button>
+            <button class="mode-tab" onclick="switchMode('image')" data-mode="image">
+                <i class="fas fa-image"></i> Image
+            </button>
+            <button class="mode-tab" onclick="switchMode('video')" data-mode="video">
+                <i class="fas fa-video"></i> Video
+            </button>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div class="welcome" id="welcomeScreen">
+            <h1>👋 Hello!</h1>
+            <p>What would you like to create today?</p>
+            
+            <div class="quick-grid">
+                <div class="quick-card" onclick="quickAction('Explain quantum physics simply')">
+                    <i class="fas fa-brain"></i>
+                    <h3>Learn</h3>
+                    <p>Any topic</p>
+                </div>
+                <div class="quick-card" onclick="quickAction('Generate a beautiful sunset')">
+                    <i class="fas fa-image"></i>
+                    <h3>Image</h3>
+                    <p>AI Art</p>
+                </div>
+                <div class="quick-card" onclick="quickAction('Create a nature video')">
+                    <i class="fas fa-video"></i>
+                    <h3>Video</h3>
+                    <p>AI Video</p>
+                </div>
+                <div class="quick-card" onclick="quickAction('Help with homework')">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h3>Study</h3>
+                    <p>Homework</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-box" id="chatBox"></div>
+
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generating...</p>
+        </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+        <div class="input-box">
+            <button class="input-btn" onclick="showToast('Attach - Coming soon!')">
+                <i class="fas fa-paperclip"></i>
+            </button>
+            <textarea id="userInput" placeholder="Type your message..." rows="1" onkeypress="handleKey(event)"></textarea>
+            <button class="input-btn mic-btn" id="micBtn" onclick="toggleMic()">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="input-btn send-btn" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">Message</div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
+            authDomain: "khangpt-4176b.firebaseapp.com",
+            projectId: "khangpt-4176b"
+        };
+
+        // Initialize Firebase safely
+        let auth, db, currentUser = null, userCredits = 0;
+        
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            console.log('Firebase initialized');
+        } catch (e) {
+            console.error('Firebase error:', e);
+        }
+
+        let currentMode = 'chat';
+        let isRecording = false;
+
+        // Auth State
+        if (auth) {
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('loginBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+                    document.getElementById('loginBtn').onclick = logout;
+                    
+                    // Load credits
+                    try {
+                        const doc = await db.collection('users').doc(user.uid).get();
+                        if (doc.exists) {
+                            userCredits = doc.data().credits || 0;
+                        } else {
+                            await db.collection('users').doc(user.uid).set({ credits: 10 });
+                            userCredits = 10;
+                        }
+                        updateCredits();
+                    } catch (e) {
+                        console.error('Credits error:', e);
+                    }
+                } else {
+                    currentUser = null;
+                    userCredits = 0;
+                    document.getElementById('loginBtn').innerHTML = '<i class="fas fa-user"></i> Login';
+                    document.getElementById('loginBtn').onclick = login;
+                    updateCredits();
+                }
+            });
+        }
+
+        function updateCredits() {
+            document.getElementById('creditsDisplay').textContent = userCredits;
+        }
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update tabs
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.mode === mode);
+            });
+            
+            // Update placeholder
+            const placeholders = {
+                chat: 'Ask me anything...',
+                image: 'Describe image...',
+                video: 'Describe video...'
+            };
+            document.getElementById('userInput').placeholder = placeholders[mode];
+            
+            // Show welcome if no messages
+            const chatBox = document.getElementById('chatBox');
+            if (chatBox.children.length === 0) {
+                document.getElementById('welcomeScreen').style.display = 'block';
+                chatBox.style.display = 'none';
+            }
+        }
+
+        async function login() {
+            if (!auth) {
+                showToast('Error: Firebase not loaded', 'error');
+                return;
+            }
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithPopup(provider);
+                showToast('Welcome!', 'success');
+            } catch (e) {
+                showToast('Login failed: ' + e.message, 'error');
+            }
+        }
+
+        function logout() {
+            if (auth) auth.signOut();
+            showToast('Logged out', 'success');
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function quickAction(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
+        }
+
+        function toggleMic() {
+            if (!('webkitSpeechRecognition' in window)) {
+                showToast('Voice not supported', 'error');
+                return;
+            }
+            
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        function startRecording() {
+            isRecording = true;
+            document.getElementById('micBtn').classList.add('recording');
+            
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.onresult = (e) => {
+                document.getElementById('userInput').value = e.results[0][0].transcript;
+                stopRecording();
+            };
+            recognition.onerror = () => {
+                stopRecording();
+                showToast('Voice error', 'error');
+            };
+            recognition.start();
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            document.getElementById('micBtn').classList.remove('recording');
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+            if (!currentUser) {
+                showToast('Please login first', 'error');
+                return;
+            }
+            if (userCr
