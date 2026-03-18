@@ -1,354 +1,740 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KhanGPT Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<title>KhanGPT Dashboard</title>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #14141f;
+            --bg-card: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --accent: #6366f1;
+            --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --gold: #f59e0b;
+            --border: rgba(255,255,255,0.1);
+        }
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        .light-mode {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-card: #f1f3f4;
+            --text-primary: #1a1a2e;
+            --text-secondary: #5f6368;
+            --border: rgba(0,0,0,0.1);
+        }
 
-<style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            transition: all 0.3s;
+        }
 
-body{
-margin:0;
-font-family:Arial;
-background:#0f0c29;
-color:white;
-display:flex;
-}
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            z-index: 1000;
+        }
 
-/* SIDEBAR */
+        .mobile-menu-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+        }
 
-.sidebar{
-width:220px;
-background:#14113b;
-height:100vh;
-padding:20px;
-position:fixed;
-}
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-secondary);
+            height: 100vh;
+            padding: 25px;
+            position: fixed;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 999;
+            transition: transform 0.3s;
+        }
 
-.sidebar h2{
-color:gold;
-}
+        .sidebar-header {
+            margin-bottom: 30px;
+        }
 
-.sidebar a{
-display:block;
-color:white;
-text-decoration:none;
-margin-top:15px;
-}
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-.sidebar a:hover{
-color:gold;
-}
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
 
-/* MAIN */
+        .nav-item:hover, .nav-item.active {
+            background: var(--accent);
+            color: white;
+        }
 
-.main{
-margin-left:240px;
-padding:30px;
-width:100%;
-}
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+            font-size: 18px;
+        }
 
-/* GENERATOR */
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
 
-input{
-width:90%;
-max-width:500px;
-padding:12px;
-border-radius:8px;
-border:none;
-}
+        .credits-display {
+            background: var(--accent-gradient);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            color: white;
+            margin-bottom: 15px;
+        }
 
-button{
-padding:10px 16px;
-border:none;
-border-radius:8px;
-background:gold;
-cursor:pointer;
-font-weight:bold;
-}
+        .credits-amount {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 10px 0;
+        }
 
-.templates{
-margin-bottom:20px;
-}
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
 
-.templates button{
-background:#333;
-color:white;
-margin:5px;
-}
+        .auth-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
 
-#result img{
-margin-top:20px;
-max-width:90%;
-border-radius:10px;
-}
+        /* Main Content */
+        .main {
+            margin-left: 260px;
+            padding: 30px;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+        }
 
-.history{
-display:flex;
-flex-wrap:wrap;
-gap:15px;
-margin-top:30px;
-}
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
 
-.history img{
-width:150px;
-border-radius:10px;
-}
+        .page-title h1 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
 
-</style>
+        .page-title p {
+            color: var(--text-secondary);
+        }
 
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+        }
+
+        .icon-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon.purple { background: rgba(99, 102, 241, 0.2); color: #6366f1; }
+        .stat-icon.gold { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .stat-icon.blue { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+
+        .stat-info h3 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Generator Section */
+        .generator-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .section-header h2 {
+            font-size: 20px;
+        }
+
+        /* Mode Tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .mode-tab {
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: 2px solid var(--border);
+            background: transparent;
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .mode-tab.active {
+            background: var(--accent-gradient);
+            border-color: transparent;
+            color: white;
+        }
+
+        /* Templates */
+        .templates {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .template-btn {
+            padding: 10px 18px;
+            border: 1px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .template-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Input Area */
+        .input-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .prompt-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .prompt-input:focus {
+            border-color: var(--accent);
+        }
+
+        .generate-btn {
+            padding: 15px 30px;
+            background: var(--accent-gradient);
+            border: none;
+            color: white;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .generate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Result Area */
+        .result-area {
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            margin-top: 20px;
+        }
+
+        .result-area.has-content {
+            border-style: solid;
+            border-color: var(--border);
+        }
+
+        .result-placeholder {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px;
+        }
+
+        .result-placeholder i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .result-image {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 12px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* History Section */
+        .history-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-title h2 {
+            font-size: 20px;
+        }
+
+        .view-all {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .history-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .history-item:hover {
+            transform: scale(1.05);
+        }
+
+        .history-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .history-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .history-item:hover .history-overlay {
+            opacity: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 3000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success { border-color: #10b981; }
+        .toast.error { border-color: #ef4444; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                padding: 80px 15px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .history-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Overlay for mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+    </style>
 </head>
-
 <body>
-
-<!-- SIDEBAR -->
-
-<div class="sidebar">
-
-<h2>KhanGPT</h2>
-
-<a href="dashboard.html">Generate</a>
-
-<a href="gallery.html">Gallery</a>
-
-<a href="trending.html">Trending</a>
-
-<a href="buy.html">Buy Credits</a>
-
-<a href="account.html">Account</a>
-
-<br>
-
-<button id="loginBtn">Login</button>
-
-<button id="logoutBtn" style="display:none;">Logout</button>
-
-</div>
-
-<!-- MAIN -->
-
-<div class="main">
-
-<h1>AI Image Generator</h1>
-
-<div class="templates">
-
-<button onclick="setPrompt('Islamic calligraphy golden mosque background')">
-Islamic
-</button>
-
-<button onclick="setPrompt('cute 3D cartoon pixar style character')">
-Cartoon
-</button>
-
-<button onclick="setPrompt('anime character ultra detailed cinematic lighting')">
-Anime
-</button>
-
-<button onclick="setPrompt('youtube thumbnail dramatic lighting ultra hd')">
-Thumbnail
-</button>
-
-</div>
-
-<input id="prompt" placeholder="Enter prompt">
-
-<br><br>
-
-<button onclick="generate()">Generate</button>
-
-<p id="usageText"></p>
-
-<div id="result"></div>
-
-<h2>My Images</h2>
-
-<div id="history" class="history"></div>
-
-</div>
-
-<!-- FIREBASE -->
-
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
-<script>
-
-const firebaseConfig={
-apiKey:"AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
-authDomain:"khangpt-4176b.firebaseapp.com",
-projectId:"khangpt-4176b"
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const auth=firebase.auth();
-const db=firebase.firestore();
-
-let currentUser=null;
-let userCredits=0;
-
-document.getElementById("loginBtn").onclick=async()=>{
-
-const provider=new firebase.auth.GoogleAuthProvider();
-await auth.signInWithPopup(provider);
-
-};
-
-document.getElementById("logoutBtn").onclick=()=>{
-
-auth.signOut();
-
-};
-
-auth.onAuthStateChanged(async(user)=>{
-
-if(user){
-
-currentUser=user;
-
-document.getElementById("loginBtn").style.display="none";
-document.getElementById("logoutBtn").style.display="inline-block";
-
-await setupUser();
-loadHistory();
-
-}
-
-});
-
-function setPrompt(text){
-
-document.getElementById("prompt").value=text;
-
-}
-
-async function setupUser(){
-
-const ref=db.collection("users").doc(currentUser.uid);
-
-const doc=await ref.get();
-
-if(!doc.exists){
-
-await ref.set({
-
-credits:5,
-createdAt:Date.now()
-
-});
-
-userCredits=5;
-
-}else{
-
-userCredits=doc.data().credits||0;
-
-}
-
-updateUI();
-
-}
-
-function updateUI(){
-
-document.getElementById("usageText").innerText="Credits: "+userCredits;
-
-}
-
-async function generate(){
-
-const prompt=document.getElementById("prompt").value;
-
-if(!currentUser){
-
-alert("Login first");
-return;
-
-}
-
-if(userCredits<=0){
-
-alert("No credits left");
-return;
-
-}
-
-document.getElementById("result").innerHTML="Generating...";
-
-const res=await fetch("/api/generate",{
-
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({prompt})
-
-});
-
-const data=await res.json();
-
-document.getElementById("result").innerHTML=
-
-'<img src="'+data.url+'">';
-
-await db.collection("users")
-
-.doc(currentUser.uid)
-
-.collection("images")
-
-.add({
-
-prompt:prompt,
-imageUrl:data.url,
-createdAt:Date.now()
-
-});
-
-userCredits--;
-
-await db.collection("users")
-
-.doc(currentUser.uid)
-
-.update({credits:userCredits});
-
-updateUI();
-
-loadHistory();
-
-}
-
-async function loadHistory(){
-
-const snap=await db.collection("users")
-
-.doc(currentUser.uid)
-
-.collection("images")
-
-.orderBy("createdAt","desc")
-
-.get();
-
-const history=document.getElementById("history");
-
-history.innerHTML="";
-
-snap.forEach(doc=>{
-
-const data=doc.data();
-
-history.innerHTML+=
-
-'<div><img src="'+data.imageUrl+'"></div>';
-
-});
-
-}
-
-</script>
-
-</body>
-</html>
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo">
+            <i class="fas fa-bolt"></i> KhanGPT
+        </div>
+        <button class="icon-btn" onclick="toggleTheme()">
+            <i class="fas fa-moon" id="themeIcon"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-bolt"></i> KhanGPT
+            </div>
+        </div>
+
+        <nav>
+            <a href="dashboard.html" class="nav-item active">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="index.html" class="nav-item">
+                <i class="fas fa-comments"></i> AI Chat
+            </a>
+            <a href="gallery.html" class="nav-item">
+                <i class="fas fa-images"></i> Gallery
+            </a>
+            <a href="trending.html" class="nav-item">
+                <i class="fas fa-fire"></i> Trending
+            </a>
+            <a href="prompt-library.html" class="nav-item">
+                <i class="fas fa-book"></i> Prompt Library
+            </a>
+            <a href="buy.html" class="nav-item">
+                <i class="fas fa-coins"></i> Buy Credits
+            </a>
+            <a href="account.html" class="nav-item">
+                <i class="fas fa-user"></i> Account
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="credits-display">
+                <div style="font-size: 13px; opacity: 0.9;">Available Credits</div>
+                <div class="credits-amount" id="creditsDisplay">0</div>
+            </div>
+            <button class="auth-btn" id="authBtn" onclick="handleAuth()">
+                <i class="fas fa-sign-in-alt"></i> <span id="authText">Login</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Dashboard</h1>
+                <p>Create amazing AI content</p>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-moon" id="desktopThemeIcon"></i>
+                </button>
+                <button class="icon-btn" onclick="refreshData()" title="Refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="fas fa-image"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalImages">0</h3>
+                    <p>Images Created</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon gold">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="creditsCard">0</h3>
+                    <p>Credits Left</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalVideos">0</h3>
+                    <p>Videos Created</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalChats">0</h3>
+                    <p>Chat Messages</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generator -->
+        <div class="generator-section">
+            <div class="section-header">
+                <i class="fas fa-wand-magic-sparkles" style="color: var(--gold);"></i>
+                <h2>Quick Generate</h2>
+            </div>
+
+            <div
