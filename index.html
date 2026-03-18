@@ -20,6 +20,7 @@
             --text-secondary: #a0a0b0;
             --accent: #6366f1;
             --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --gold: #f59e0b;
             --border: rgba(255,255,255,0.1);
         }
 
@@ -37,7 +38,7 @@
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
-            transition: all 0.3s ease;
+            overflow-x: hidden;
         }
 
         /* Header */
@@ -76,29 +77,6 @@
             background: linear-gradient(135deg, #f59e0b, #ef4444);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .icon-btn {
-            width: 45px;
-            height: 45px;
-            border: none;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border-radius: 12px;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .login-btn {
@@ -112,21 +90,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .user-badge {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 5px 15px;
-            background: var(--bg-card);
-            border-radius: 25px;
-        }
-
-        .user-badge img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
         }
 
         /* Sidebar */
@@ -176,17 +139,11 @@
             color: var(--text-primary);
             text-decoration: none;
             cursor: pointer;
-            transition: all 0.2s;
+            background: var(--bg-card);
         }
 
-        .nav-item:hover, .nav-item.active {
+        .nav-item:hover {
             background: var(--accent);
-            color: white;
-        }
-
-        .nav-item i {
-            width: 24px;
-            text-align: center;
         }
 
         .credits-box {
@@ -204,26 +161,24 @@
             margin: 10px 0;
         }
 
-        /* Main Content */
+        /* Main */
         .main {
             margin-top: 65px;
             padding: 20px;
-            padding-bottom: 120px;
+            padding-bottom: 100px;
         }
 
-        /* Mode Selector */
+        /* Mode Tabs */
         .mode-tabs {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 30px;
             overflow-x: auto;
-            padding-bottom: 5px;
         }
 
         .mode-tab {
             flex: 1;
-            min-width: 100px;
-            padding: 15px 20px;
+            padding: 15px;
             border-radius: 16px;
             border: 2px solid var(--border);
             background: var(--bg-card);
@@ -235,26 +190,18 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: all 0.2s;
             white-space: nowrap;
         }
 
         .mode-tab.active {
             background: var(--accent-gradient);
             border-color: transparent;
-            color: white;
         }
 
-        /* Welcome Screen */
+        /* Welcome */
         .welcome {
             text-align: center;
-            padding: 30px 20px;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            padding: 40px 20px;
         }
 
         .welcome h1 {
@@ -267,7 +214,6 @@
 
         .welcome p {
             color: var(--text-secondary);
-            font-size: 16px;
             margin-bottom: 40px;
         }
 
@@ -286,13 +232,10 @@
             padding: 25px 15px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .quick-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        .quick-card:active {
+            transform: scale(0.98);
         }
 
         .quick-card i {
@@ -309,30 +252,20 @@
         .quick-card p {
             font-size: 13px;
             color: var(--text-secondary);
-            margin: 0;
         }
 
-        /* Chat Area */
-        .chat-container {
+        /* Chat */
+        .chat-box {
             display: none;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             margin-bottom: 20px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
         }
 
         .message {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             max-width: 85%;
-            animation: slideIn 0.3s;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
         }
 
         .message.user {
@@ -348,81 +281,42 @@
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            flex-shrink: 0;
-            font-size: 16px;
-        }
-
-        .message.ai .msg-avatar {
             background: var(--accent-gradient);
             color: white;
         }
 
         .message.user .msg-avatar {
             background: linear-gradient(135deg, #f59e0b, #ef4444);
-            color: white;
         }
 
         .msg-bubble {
             background: var(--bg-card);
-            border: 1px solid var(--border);
             padding: 15px 20px;
             border-radius: 20px;
-            line-height: 1.6;
-            font-size: 15px;
+            line-height: 1.5;
         }
 
         .message.user .msg-bubble {
             background: var(--accent-gradient);
-            color: white;
-            border: none;
         }
 
-        .msg-image {
-            max-width: 100%;
-            border-radius: 12px;
-            margin-top: 10px;
-        }
-
-        .typing-indicator {
-            display: flex;
-            gap: 6px;
-            padding: 10px;
-        }
-
-        .typing-indicator span {
-            width: 10px;
-            height: 10px;
-            background: var(--accent);
-            border-radius: 50%;
-            animation: bounce 1.4s infinite;
-        }
-
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes bounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
-
-        /* Input Area */
+        /* Input */
         .input-area {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
             padding: 15px;
-            z-index: 100;
+            border-top: 1px solid var(--border);
         }
 
-        .input-container {
-            max-width: 800px;
-            margin: 0 auto;
+        .input-box {
             display: flex;
             gap: 10px;
             align-items: flex-end;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .input-wrapper {
@@ -431,12 +325,11 @@
             align-items: center;
             gap: 10px;
             background: var(--bg-card);
-            border: 1px solid var(--border);
             border-radius: 25px;
             padding: 5px 5px 5px 15px;
         }
 
-        #messageInput {
+        #userInput {
             flex: 1;
             background: transparent;
             border: none;
@@ -445,15 +338,11 @@
             padding: 12px 0;
             outline: none;
             resize: none;
-            max-height: 120px;
             min-height: 24px;
+            max-height: 100px;
         }
 
-        #messageInput::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .input-action {
+        .input-btn {
             width: 45px;
             height: 45px;
             border: none;
@@ -464,18 +353,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            transition: all 0.2s;
-        }
-
-        .input-action:hover {
-            background: var(--border);
-            color: var(--text-primary);
-        }
-
-        .mic-btn.recording {
-            color: #ef4444;
-            animation: pulse 1.5s infinite;
         }
 
         .send-btn {
@@ -490,15 +367,34 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            transition: all 0.2s;
         }
 
-        .send-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
         }
 
-        /* Toast Notification */
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast */
         .toast {
             position: fixed;
             top: 80px;
@@ -507,110 +403,39 @@
             background: #333;
             color: white;
             padding: 15px 30px;
-            border-radius: 50px;
-            font-weight: 500;
+            border-radius: 25px;
             opacity: 0;
             transition: all 0.3s;
             z-index: 2000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .toast.show {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
         }
-
-        .toast.success { background: #10b981; }
-        .toast.error { background: #ef4444; }
-        .toast.info { background: #3b82f6; }
-
-        /* Loading Spinner */
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: white;
-            font-size: 18px;
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-primary);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent);
-        }
     </style>
 </head>
 <body>
-
     <!-- Header -->
-    <header class="header">
-        <button class="menu-btn" onclick="toggleSidebar()">
+    <div class="header">
+        <button class="menu-btn" onclick="toggleMenu()">
             <i class="fas fa-bars"></i>
         </button>
-        
-        <div class="logo">
-            <i class="fas fa-bolt"></i> KhanGPT
-        </div>
-        
-        <div class="header-actions">
-            <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">
-                <i class="fas fa-moon" id="themeIcon"></i>
-            </button>
-            <button class="login-btn" id="authBtn" onclick="handleAuth()">
-                <i class="fas fa-user"></i> <span id="authText">Login</span>
-            </button>
-        </div>
-    </header>
+        <div class="logo">⚡ KhanGPT</div>
+        <button class="login-btn" id="loginBtn" onclick="handleLogin()">
+            <i class="fas fa-user"></i> <span id="loginText">Login</span>
+        </button>
+    </div>
 
-    <!-- Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <!-- Overlay -->
+    <div class="sidebar-overlay" id="overlay" onclick="toggleMenu()"></div>
 
     <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="nav-item active" onclick="switchMode('chat')">
+    <div class="sidebar" id="sidebar">
+        <div class="nav-item" onclick="goToPage('dashboard.html')">
+            <i class="fas fa-home"></i> Dashboard
+        </div>
+        <div class="nav-item" onclick="switchMode('chat')">
             <i class="fas fa-comments"></i> AI Chat
         </div>
         <div class="nav-item" onclick="switchMode('image')">
@@ -619,59 +444,65 @@
         <div class="nav-item" onclick="switchMode('video')">
             <i class="fas fa-video"></i> Create Video
         </div>
-        <div class="nav-item" onclick="showToast('History - Coming soon!', 'info')">
-            <i class="fas fa-history"></i> History
+        <div class="nav-item" onclick="goToPage('gallery.html')">
+            <i class="fas fa-images"></i> Gallery
         </div>
-        <div class="nav-item" onclick="showToast('Settings - Coming soon!', 'info')">
-            <i class="fas fa-cog"></i> Settings
+        <div class="nav-item" onclick="goToPage('trending.html')">
+            <i class="fas fa-fire"></i> Trending
+        </div>
+        <div class="nav-item" onclick="goToPage('prompt-library.html')">
+            <i class="fas fa-book"></i> Prompt Library
+        </div>
+        <div class="nav-item" onclick="goToPage('account.html')">
+            <i class="fas fa-user"></i> Account
+        </div>
+        <div class="nav-item" onclick="goToPage('buy.html')">
+            <i class="fas fa-coins"></i> Buy Credits
         </div>
         
         <div class="credits-box">
-            <div style="font-size: 14px; opacity: 0.9;">Available Credits</div>
+            <div style="font-size: 14px;">Credits</div>
             <div class="credits-amount" id="creditsDisplay">0</div>
-            <button class="login-btn" style="width: 100%; margin-top: 10px;" onclick="buyCredits()">
-                <i class="fas fa-coins"></i> Buy Credits
-            </button>
         </div>
-    </nav>
+    </div>
 
-    <!-- Main Content -->
-    <main class="main">
+    <!-- Main -->
+    <div class="main">
         <!-- Mode Tabs -->
         <div class="mode-tabs">
-            <button class="mode-tab active" onclick="switchMode('chat')" data-mode="chat">
+            <button class="mode-tab active" onclick="switchMode('chat')" id="tab-chat">
                 <i class="fas fa-comments"></i> Chat
             </button>
-            <button class="mode-tab" onclick="switchMode('image')" data-mode="image">
+            <button class="mode-tab" onclick="switchMode('image')" id="tab-image">
                 <i class="fas fa-image"></i> Image
             </button>
-            <button class="mode-tab" onclick="switchMode('video')" data-mode="video">
+            <button class="mode-tab" onclick="switchMode('video')" id="tab-video">
                 <i class="fas fa-video"></i> Video
             </button>
         </div>
 
-        <!-- Welcome Screen -->
+        <!-- Welcome -->
         <div class="welcome" id="welcomeScreen">
             <h1>👋 Hello!</h1>
-            <p>What would you like to create today?</p>
+            <p>What would you like to create?</p>
             
             <div class="quick-grid">
-                <div class="quick-card" onclick="quickPrompt('Explain quantum physics in simple terms')">
+                <div class="quick-card" onclick="quickPrompt('Explain quantum physics simply')">
                     <i class="fas fa-brain"></i>
                     <h3>Learn</h3>
                     <p>Any topic</p>
                 </div>
-                <div class="quick-card" onclick="quickPrompt('Generate a futuristic city at sunset')">
+                <div class="quick-card" onclick="quickPrompt('Generate a beautiful sunset')">
                     <i class="fas fa-image"></i>
                     <h3>Image</h3>
                     <p>AI Art</p>
                 </div>
-                <div class="quick-card" onclick="quickPrompt('Create a video about space exploration')">
+                <div class="quick-card" onclick="quickPrompt('Create a nature video')">
                     <i class="fas fa-video"></i>
                     <h3>Video</h3>
                     <p>AI Video</p>
                 </div>
-                <div class="quick-card" onclick="quickPrompt('Help me solve this math problem')">
+                <div class="quick-card" onclick="quickPrompt('Help with homework')">
                     <i class="fas fa-graduation-cap"></i>
                     <h3>Study</h3>
                     <p>Homework</p>
@@ -679,34 +510,165 @@
             </div>
         </div>
 
-        <!-- Chat Container -->
-        <div class="chat-container" id="chatContainer"></div>
-    </main>
+        <!-- Chat -->
+        <div class="chat-box" id="chatBox"></div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generating...</p>
+        </div>
+    </div>
 
-    <!-- Input Area -->
+    <!-- Input -->
     <div class="input-area">
-        <div class="input-container">
+        <div class="input-box">
             <div class="input-wrapper">
-                <button class="input-action" onclick="attachFile()" title="Attach file">
+                <button class="input-btn" onclick="attachFile()">
                     <i class="fas fa-paperclip"></i>
                 </button>
-                <textarea id="messageInput" placeholder="Type your message..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
-                <button class="input-action mic-btn" id="micBtn" onclick="toggleMic()" title="Voice input">
+                <textarea id="userInput" placeholder="Type message..." rows="1" onkeypress="handleKey(event)"></textarea>
+                <button class="input-btn" onclick="toggleMic()" id="micBtn">
                     <i class="fas fa-microphone"></i>
                 </button>
             </div>
-            <button class="send-btn" onclick="sendMessage()" title="Send message">
+            <button class="send-btn" onclick="sendMessage()">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
     </div>
 
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-        <div class="loading-text" id="loadingText">Generating...</div>
-    </div>
-
     <!-- Toast -->
-    <div class="toast" id="toast">
-        <i class="fas fa-check-circle"></i>
+    <div class="toast" id="toast">Message</div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ✅ SABSE PEHLE Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLvIHX6lGZGC7YViPH5Pf3Sc9AV7-BcM4",
+            authDomain: "khangpt-4176b.firebaseapp.com",
+            projectId: "khangpt-4176b"
+        };
+
+        // Global Variables
+        let auth, db, currentUser = null;
+        let currentMode = 'chat';
+        let userCredits = 0;
+
+        // ✅ PAGE LOAD HOTE HI Initialize
+        window.onload = function() {
+            console.log('Page loaded, initializing...');
+            
+            try {
+                // Firebase Init
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                console.log('Firebase OK');
+
+                // Auth State Listener
+                auth.onAuthStateChanged(user => {
+                    console.log('Auth state:', user ? 'logged in' : 'logged out');
+                    if (user) {
+                        currentUser = user;
+                        document.getElementById('loginText').textContent = 'Logout';
+                        loadUserCredits(user.uid);
+                    } else {
+                        currentUser = null;
+                        userCredits = 0;
+                        document.getElementById('loginText').textContent = 'Login';
+                        document.getElementById('creditsDisplay').textContent = '0';
+                    }
+                });
+
+            } catch (e) {
+                console.error('Firebase error:', e);
+                showToast('Error loading app', 'error');
+            }
+        };
+
+        // ✅ SIDEBAR TOGGLE
+        function toggleMenu() {
+            console.log('Toggle menu clicked');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        // ✅ PAGE NAVIGATION
+        function goToPage(url) {
+            console.log('Going to:', url);
+            window.location.href = url;
+        }
+
+        // ✅ MODE SWITCH
+        function switchMode(mode) {
+            console.log('Switching to mode:', mode);
+            currentMode = mode;
+            
+            // Update tabs
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            const tabMap = {
+                'chat': 'tab-chat',
+                'image': 'tab-image', 
+                'video': 'tab-video'
+            };
+            
+            const activeTab = document.getElementById(tabMap[mode]);
+            if (activeTab) activeTab.classList.add('active');
+            
+            // Update placeholder
+            const placeholders = {
+                chat: 'Ask me anything...',
+                image: 'Describe image...',
+                video: 'Describe video...'
+            };
+            document.getElementById('userInput').placeholder = placeholders[mode];
+            
+            // Close sidebar
+            toggleMenu();
+        }
+
+        // ✅ LOGIN/LOGOUT
+        async function handleLogin() {
+            console.log('Login clicked, current user:', currentUser);
+            
+            if (currentUser) {
+                // Logout
+                try {
+                    await auth.signOut();
+                    showToast('Logged out');
+                } catch (e) {
+                    showToast('Error: ' + e.message, 'error');
+                }
+            } else {
+                // Login
+                try {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    await auth.signInWithPopup(provider);
+                    showToast('Welcome!');
+                } catch (e) {
+                    showToast('Login failed: ' + e.message, 'error');
+                }
+            }
+        }
+
+        // ✅ LOAD USER CREDITS
+        async function loadUserCredits(uid) {
+            try {
+                const doc = await db.collection('users').doc(uid).get();
+                if (doc.exists) {
+                    userCredits = doc.data().credits || 0;
+                    document.getElementById('creditsDisplay').textContent = userCredits;
+                } else {
+                    // New user
+                    await db.collection('users').doc(uid).set({
+                        credits: 10,
+  
