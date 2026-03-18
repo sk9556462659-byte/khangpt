@@ -1,74 +1,715 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Credits - KhanGPT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<title>Buy Credits</title>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #14141f;
+            --bg-card: #1a1a2e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --accent: #6366f1;
+            --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --gold: #f59e0b;
+            --success: #10b981;
+            --border: rgba(255,255,255,0.1);
+        }
 
-<style>
+        .light-mode {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-card: #f1f3f4;
+            --text-primary: #1a1a2e;
+            --text-secondary: #5f6368;
+            --border: rgba(0,0,0,0.1);
+        }
 
-body{
-background:#0f0c29;
-color:white;
-font-family:Arial;
-text-align:center;
-}
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
 
-.card{
-background:#1b1738;
-padding:20px;
-margin:20px auto;
-width:250px;
-border-radius:10px;
-}
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            z-index: 1000;
+        }
 
-button{
-padding:10px;
-border:none;
-border-radius:8px;
-background:gold;
-cursor:pointer;
-font-weight:bold;
-}
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-</style>
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
 
+        .icon-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+        }
+
+        .icon-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Main */
+        .main {
+            margin-top: 70px;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .current-credits {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card);
+            padding: 15px 30px;
+            border-radius: 50px;
+            margin-top: 25px;
+            border: 1px solid var(--border);
+        }
+
+        .current-credits i {
+            color: var(--gold);
+            font-size: 24px;
+        }
+
+        .current-credits span {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* Pricing Grid */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .pricing-card.popular {
+            border-color: var(--gold);
+            transform: scale(1.05);
+        }
+
+        .pricing-card.popular:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold);
+            color: black;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .plan-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 36px;
+        }
+
+        .plan-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .plan-credits {
+            font-size: 48px;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .plan-credits span {
+            font-size: 18px;
+            -webkit-text-fill-color: var(--text-secondary);
+        }
+
+        .plan-price {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .plan-price span {
+            font-size: 16px;
+            color: var(--text-secondary);
+            text-decoration: line-through;
+            margin-left: 10px;
+        }
+
+        .plan-save {
+            color: var(--success);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .features {
+            list-style: none;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .features li {
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+        }
+
+        .features li i {
+            color: var(--success);
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            background: var(--accent-gradient);
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .buy-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .buy-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Promo Code */
+        .promo-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            margin: 0 auto 50px;
+            text-align: center;
+        }
+
+        .promo-section h3 {
+            margin-bottom: 20px;
+        }
+
+        .promo-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .promo-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid var(--border);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .promo-input:focus {
+            border-color: var(--accent);
+        }
+
+        .promo-btn {
+            padding: 15px 25px;
+            border: none;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            border: 2px solid var(--border);
+        }
+
+        .promo-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .promo-message {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .promo-message.success { color: var(--success); }
+        .promo-message.error { color: #ef4444; }
+
+        /* Payment Methods */
+        .payment-methods {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 50px;
+        }
+
+        .payment-methods h3 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .methods-grid {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .method-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+        }
+
+        .method-item i {
+            font-size: 24px;
+        }
+
+        /* Transaction History */
+        .history-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+        }
+
+        .history-section h3 {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .transaction-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .transaction-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .transaction-details h4 {
+            margin-bottom: 5px;
+        }
+
+        .transaction-details p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .transaction-amount .credits {
+            color: var(--success);
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .transaction-amount .price {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--gold);
+        }
+
+        .empty-history {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-history i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 40px;
+            color: white;
+        }
+
+        .modal h2 {
+            margin-bottom: 15px;
+        }
+
+        .modal p {
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+        }
+
+        .modal-btn {
+            padding: 15px 40px;
+            border: none;
+            background: var(--accent-gradient);
+            color: white;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 3000;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: #ef4444; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .pricing-card.popular {
+                transform: none;
+            }
+
+            .pricing-card.popular:hover {
+                transform: translateY(-10px);
+            }
+
+            .promo-input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
-
 <body>
+    <!-- Header -->
+    <header class="header">
+        <a href="dashboard.html" class="icon-btn">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        
+        <div class="logo">
+            <i class="fas fa-coins"></i> Buy Credits
+        </div>
+        
+        <button class="icon-btn" onclick="toggleTheme()">
+            <i class="fas fa-moon" id="themeIcon"></i>
+        </button>
+    </header>
 
-<h1>Buy Credits</h1>
+    <!-- Main -->
+    <main class="main">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>Choose Your Plan</h1>
+            <p>Get more credits to create amazing AI content. One credit = one generation.</p>
+            
+            <div class="current-credits" id="creditDisplay">
+                <i class="fas fa-coins"></i>
+                <span>0</span> Credits Available
+            </div>
+        </div>
 
-<div class="card">
+        <!-- Pricing -->
+        <div class="pricing-grid">
+            <!-- Starter -->
+            <div class="pricing-card">
+                <div class="plan-icon">⚡</div>
+                <div class="plan-name">Starter</div>
+                <div class="plan-credits">20 <span>credits</span></div>
+                <div class="plan-price">₹20</div>
+                <div class="plan-save">₹1 per credit</div>
+                <ul class="features">
+                    <li><i class="fas fa-check"></i> 20 AI Generations</li>
+                    <li><i class="fas fa-check"></i> All Features Access</li>
+                    <li><i class="fas fa-check"></i> Standard Speed</li>
+                    <li><i class="fas fa-check"></i> Email Support</li>
+                </ul>
+                <button class="buy-btn" onclick="initiatePayment('starter', 20, 20)">
+                    <i class="fas fa-bolt"></i> Buy Now
+                </button>
+            </div>
 
-<h3>20 Credits</h3>
+            <!-- Popular -->
+            <div class="pricing-card popular">
+                <div class="popular-badge">Most Popular</div>
+                <div class="plan-icon">🔥</div>
+                <div class="plan-name">Pro</div>
+                <div class="plan-credits">100 <span>credits</span></div>
+                <div class="plan-price">₹80 <span>₹100</span></div>
+                <div class="plan-save">Save ₹20 (20% off)</div>
+                <ul class="features">
+                    <li><i class="fas fa-check"></i> 100 AI Generations</li>
+                    <li><i class="fas fa-check"></i> All Features Access</li>
+                    <li><i class="fas fa-check"></i> Priority Speed</li>
+                    <li><i class="fas fa-check"></i> 24/7 Support</li>
+                </ul>
+                <button class="buy-btn" onclick="initiatePayment('pro', 100, 80)">
+                    <i class="fas fa-fire"></i> Buy Now
+                </button>
+            </div>
 
-<p>₹20</p>
+            <!-- Unlimited -->
+            <div class="pricing-card">
+                <div class="plan-icon">👑</div>
+                <div class="plan-name">Unlimited</div>
+                <div class="plan-credits">500 <span>credits</span></div>
+                <div class="plan-price">₹350 <span>₹500</span></div>
+                <div class="plan-save">Save ₹150 (30% off)</div>
+                <ul class="features">
+                    <li><i class="fas fa-check"></i> 500 AI Generations</li>
+                    <li><i class="fas fa-check"></i> All Premium Features</li>
+                    <li><i class="fas fa-check"></i> Fastest Speed</li>
+                    <li><i class="fas fa-check"></i> Priority Support</li>
+                </ul>
+                <button class="buy-btn" onclick="initiatePayment('unlimited', 500, 350)">
+                    <i class="fas fa-crown"></i> Buy Now
+                </button>
+            </div>
+        </div>
 
-<button onclick="buyPlan(20)">Buy</button>
+        <!-- Promo Code -->
+        <div class="promo-section">
+            <h3><i class="fas fa-tag"></i> Have a Promo Code?</h3>
+            <div class="promo-input-group">
+                <input type="text" class="promo-input" id="promoCode" placeholder="Enter code (e.g., KHAN50)">
+                <button class="promo-btn" onclick="applyPromo()">Apply</button>
+            </div>
+            <div class="promo-message" id="promoMessage"></div>
+        </div>
 
-</div>
+        <!-- Payment Methods -->
+        <div class="payment-methods">
+            <h3><i class="fas fa-shield-alt"></i> Secure Payment Methods</h3>
+            <div class="methods-grid">
+                <div class="method-item">
+                    <i class="fas fa-qrcode"></i> UPI
+                </div>
+                <div class="method-item">
+                    <i class="fas fa-credit-card"></i> Card
+                </div>
+                <div class="method-item">
+                    <i class="fas fa-university"></i> NetBanking
+                </div>
+                <div class="method-item">
+                    <i class="fas fa-wallet"></i> Wallet
+                </div>
+            </div>
+        </div>
 
-<div class="card">
-
-<h3>100 Credits</h3>
-
-<p>₹80</p>
-
-<button onclick="buyPlan(100)">Buy</button>
-
-</div>
-
-<script>
-
-function buyPlan(credits){
-
-alert("Payment system coming soon");
-
-}
-
-</script>
-
-</body>
-
-</html>
+        <!-- Transaction History -->
+        <div class="history-section">
+            <h3><i class="fas fa-history"></
