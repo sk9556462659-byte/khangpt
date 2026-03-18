@@ -1,15 +1,262 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Page not found</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | KhanGPT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 50%;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Glitch Effect */
+        .glitch-container {
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .glitch {
+            font-size: 150px;
+            font-weight: 900;
+            color: #fff;
+            position: relative;
+            text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+            animation: glitch-skew 1s infinite linear alternate-reverse;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: '404';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00fff9;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(31px, 9999px, 94px, 0); }
+            20% { clip: rect(78px, 9999px, 20px, 0); }
+            40% { clip: rect(12px, 9999px, 6px, 0); }
+            60% { clip: rect(65px, 9999px, 89px, 0); }
+            80% { clip: rect(23px, 9999px, 67px, 0); }
+            100% { clip: rect(91px, 9999px, 34px, 0); }
+        }
+
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 99px, 0); }
+            20% { clip: rect(12px, 9999px, 45px, 0); }
+            40% { clip: rect(78px, 9999px, 23px, 0); }
+            60% { clip: rect(34px, 9999px, 78px, 0); }
+            80% { clip: rect(89px, 9999px, 12px, 0); }
+            100% { clip: rect(45px, 9999px, 56px, 0); }
+        }
+
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); }
+            10% { transform: skew(-2deg); }
+            20% { transform: skew(2deg); }
+            30% { transform: skew(0deg); }
+            100% { transform: skew(0deg); }
+        }
+
+        /* Robot Animation */
+        .robot {
+            font-size: 80px;
+            margin: 30px 0;
+            animation: robot-confused 2s ease-in-out infinite;
+        }
+
+        @keyframes robot-confused {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        /* Message */
+        .message {
+            color: #a0a0b0;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .sub-message {
+            color: #6366f1;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        /* Home Button */
+        .home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .home-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Quick Links */
+        .quick-links {
+            margin-top: 50px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .quick-link {
+            color: #a0a0b0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .quick-link:hover {
+            color: white;
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .glitch {
+                font-size: 100px;
+            }
+            .robot {
+                font-size: 60px;
+            }
+        }
+    </style>
 </head>
+<body>
+    <!-- Background Particles -->
+    <div class="bg-animation" id="particles"></div>
 
-<body style="text-align:center;font-family:Arial">
+    <!-- Main Content -->
+    <div class="glitch-container">
+        <div class="glitch">404</div>
+        
+        <div class="robot">
+            <i class="fas fa-robot"></i> 🤖
+        </div>
+        
+        <h2 class="message">Oops! Page Not Found</h2>
+        <p class="sub-message">Looks like our AI got confused...</p>
+        
+        <a href="index.html" class="home-btn">
+            <i class="fas fa-home"></i> Back to KhanGPT
+        </a>
+        
+        <div class="quick-links">
+            <a href="dashboard.html" class="quick-link">
+                <i class="fas fa-th-large"></i> Dashboard
+            </a>
+            <a href="gallery.html" class="quick-link">
+                <i class="fas fa-images"></i> Gallery
+            </a>
+            <a href="trending.html" class="quick-link">
+                <i class="fas fa-fire"></i> Trending
+            </a>
+            <a href="prompt-library.html" class="quick-link">
+                <i class="fas fa-book"></i> Prompts
+            </a>
+        </div>
+    </div>
 
-<h1>404</h1>
-<p>Page not found</p>
+    <script>
+        // Create particles
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
 
-<a href="/">Back to KhanGPT</a>
-
+        // Console easter egg
+        console.log('%c🔍 404 - Page Not Found', 'color: #6366f1; font-size: 20px; font-weight: bold;');
+        console.log('%c🤖 Did you mean: index.html?', 'color: #a0a0b0;');
+    </script>
 </body>
 </html>
