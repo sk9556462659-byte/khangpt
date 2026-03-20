@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const fetch = require("node-fetch");
 
 module.exports = async function handler(req, res) {
     if (req.method !== "POST") {
@@ -13,16 +13,30 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        const genAI = new GoogleGenerativeAI(GEMINI_KEY);
-        
-        // --- Sabse stable model use kar rahe hain ---
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-        
-        const result = await model.generateContent(prompt || "Hello");
-        const response = await result.response;
-        const text = response.text();
+        // Direct Fetch Call (Version v1beta ki jagah v1 use kar rahe hain jo stable hai)
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_KEY}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt || "Hello"
+                    }]
+                }]
+            })
+        });
 
-        return res.status(200).json({ text: text });
+        const data = await response.json();
+
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            const aiText = data.candidates[0].content.parts[0].text;
+            return res.status(200).json({ text: aiText });
+        } else {
+            throw new Error(JSON.stringify(data));
+        }
+
     } catch (error) {
         console.error("Gemini Error:", error);
         return res.status(500).json({ error: "AI Error: " + error.message });
