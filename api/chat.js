@@ -14,7 +14,9 @@ module.exports = async function handler(req, res) {
 
     try {
         const genAI = new GoogleGenerativeAI(GEMINI_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        
+        // --- FIX: Model ka naam "gemini-1.5-flash" ki jagah "gemini-pro" ya "gemini-1.5-flash-latest" try karein ---
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
         
         const result = await model.generateContent(prompt || "Hi");
         const response = await result.response;
@@ -23,6 +25,7 @@ module.exports = async function handler(req, res) {
         return res.status(200).json({ text: text });
     } catch (error) {
         console.error("Gemini Error:", error);
+        // Detail error dikhane ke liye
         return res.status(500).json({ error: "AI Error: " + error.message });
     }
 };
