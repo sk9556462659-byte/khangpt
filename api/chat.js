@@ -13,8 +13,10 @@ module.exports = async function handler(req, res) {
     }
 
     try {
-        // Direct Fetch Call (Version v1beta ki jagah v1 use kar rahe hain jo stable hai)
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_KEY}`, {
+        // --- UPDATED: Model name to gemini-1.5-flash ---
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -30,11 +32,16 @@ module.exports = async function handler(req, res) {
 
         const data = await response.json();
 
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
+        // Error checking
+        if (data.error) {
+            throw new Error(data.error.message || JSON.stringify(data.error));
+        }
+
+        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
             const aiText = data.candidates[0].content.parts[0].text;
             return res.status(200).json({ text: aiText });
         } else {
-            throw new Error(JSON.stringify(data));
+            throw new Error("Unexpected response format from Google AI");
         }
 
     } catch (error) {
