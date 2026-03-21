@@ -6,9 +6,19 @@ module.exports = async function handler(req, res) {
     const { prompt } = req.body;
     const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
+    // --- 🛠️ STEP 1: CREDIT LIMIT UPDATE ---
+    // Agar aapne manually credit 5 set kiya tha, toh hum yahan use "Bypass" kar rahe hain
+    // Taaki user bina ruke chat kar sake.
+    const userHasCredits = true; // Isse "No credits left" wala error nahi aayega
+
+    if (!userHasCredits) {
+        return res.status(403).json({ error: "No credits left. Buy more!" });
+    }
+
     try {
-        // Naya Stable URL
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+        // --- 🛠️ STEP 2: NAYA GOOGLE API URL (Fixed) ---
+        // Purana model 'gemini-pro' ab 'gemini-1.5-flash' mein badal chuka hai
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
 
         const response = await fetch(url, {
             method: 'POST',
@@ -16,22 +26,24 @@ module.exports = async function handler(req, res) {
             body: JSON.stringify({
                 contents: [{ 
                     role: "user", 
-                    parts: [{ text: "Aapka naam KhanGPT hai. Helpful rahein aur tameez se jawab dein.\n\nUser: " + prompt }] 
+                    parts: [{ text: "Aapka naam KhanGPT hai. Aap ek helpful AI assistant hain. User ka sawal: " + prompt }] 
                 }]
             })
         });
 
         const data = await response.json();
 
-        // Agar response mil gaya toh seedha dikhao (Koi credit check nahi)
+        // --- 🛠️ STEP 3: RESPONSE CHECK ---
         if (data.candidates && data.candidates[0].content) {
             const aiText = data.candidates[0].content.parts[0].text;
             return res.status(200).json({ text: aiText });
         } else {
-            return res.status(200).json({ text: "Maaf kijiyega, main abhi jawab nahi de sakta." });
+            // Agar API key mein koi masla hai toh yahan error dikhega
+            console.error("Google API Error:", data);
+            return res.status(500).json({ error: "AI response generate nahi kar paya. Key check karein." });
         }
 
     } catch (error) {
-        return res.status(500).json({ error: "Server Error" });
+        return res.status(500).json({ error: "Server side error occurred." });
     }
 };
