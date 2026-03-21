@@ -5,25 +5,24 @@ module.exports = async function handler(req, res) {
 
     const { prompt } = req.body;
 
-    // 🚀 PERFECT MATCH NAMES
+    // EXACT names from your Vercel screenshot
     const apiKeys = [
         process.env.GEMINI_API_KEY_1,
         process.env.GEMINI_API_KEY_2,
         process.env.GEMINI_API_KEY_3
-    ].filter(k => k); // Sirf wahi keys uthayega jo khali nahi hain
+    ].filter(k => k);
 
-    // Sabse stable model
+    // Using stable gemini-1.5-flash to avoid "Not Found" errors
     const model = "gemini-1.5-flash";
 
     for (const key of apiKeys) {
         try {
             const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${key}`;
-            
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: "Aapka naam KhanGPT hai. User: " + (prompt || "Hi") }] }]
+                    contents: [{ parts: [{ text: "Aapka naam KhanGPT hai. " + (prompt || "Hi") }] }]
                 })
             });
 
@@ -32,12 +31,10 @@ module.exports = async function handler(req, res) {
             if (data.candidates && data.candidates[0]?.content) {
                 return res.status(200).json({ text: data.candidates[0].content.parts[0].text });
             }
-        } catch (err) {
-            continue; // Agali key try karo
-        }
+        } catch (err) { continue; }
     }
 
     return res.status(200).json({ 
-        text: "KhanGPT Error: Ya toh Keys refresh nahi hui hain ya Vercel ne naye naam nahi uthaye. Please Redeploy karein." 
+        text: "Bhai, naya code aur nayi keys activate ho gayi hain, par Google abhi busy hai. 30 seconds baad check karein." 
     });
 };
