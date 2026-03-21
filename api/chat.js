@@ -4,11 +4,12 @@ module.exports = async function handler(req, res) {
     if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
     const { prompt } = req.body;
+    // Vercel Dashboard se key uthayega
     const apiKey = process.env.GEMINI_API_KEY_1;
 
     try {
-        // Sabse stable v1 endpoint aur 1.5-flash model
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // 🚀 LATEST 2026 STABLE ENDPOINT
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
         
         const response = await fetch(url, {
             method: 'POST',
@@ -20,14 +21,16 @@ module.exports = async function handler(req, res) {
 
         const data = await response.json();
 
+        // Agar response mil jaye
         if (data.candidates && data.candidates[0]?.content) {
             return res.status(200).json({ text: data.candidates[0].content.parts[0].text });
         }
 
-        // Agar phir bhi error aaye, toh asli wajah dikhayega
-        return res.status(200).json({ text: "Google Response: " + (data.error?.message || "Kuch galat hua") });
+        // Error handling for debugging
+        const errorMsg = data.error ? data.error.message : "API check fail hui.";
+        return res.status(200).json({ text: "Google AI Studio Error: " + errorMsg });
 
     } catch (err) {
-        return res.status(200).json({ text: "Server Connection Error: " + err.message });
+        return res.status(200).json({ text: "Server Crash Error: " + err.message });
     }
 };
