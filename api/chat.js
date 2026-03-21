@@ -4,14 +4,18 @@ module.exports = async function handler(req, res) {
     if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
     const { prompt } = req.body;
-    const key = process.env.GEMINI_API_KEY_1; // Sirf pehli key test karte hain
+    const key = process.env.GEMINI_API_KEY_1; // Vercel se key uthayega
 
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+        // 🚀 UPDATED MODEL NAME & ENDPOINT
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${key}`;
+        
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt || "Hi" }] }] })
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: "Aapka naam KhanGPT hai. User ka sawal: " + (prompt || "Hi") }] }]
+            })
         });
 
         const data = await response.json();
@@ -20,9 +24,10 @@ module.exports = async function handler(req, res) {
             return res.status(200).json({ text: data.candidates[0].content.parts[0].text });
         }
 
-        // 🚨 YEH LINE ASLI ERROR DIKHAYEGI
-        const errorMessage = data.error ? `Google Error: ${data.error.message} (Code: ${data.error.status})` : "Unknown Google Error";
-        return res.status(200).json({ text: errorMessage });
+        // Error message for debugging
+        return res.status(200).json({ 
+            text: data.error ? `Google Keh Raha Hai: ${data.error.message}` : "Connection successful but no response." 
+        });
 
     } catch (err) {
         return res.status(200).json({ text: "Server Error: " + err.message });
