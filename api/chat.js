@@ -6,17 +6,15 @@ module.exports = async function handler(req, res) {
     const { prompt } = req.body;
     const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
-    // --- 🚀 MODELS KI LIST (Priority wise) ---
-    // Sabse pehle Flash try hoga (Fast), phir Pro (Smart)
+    // --- 🚀 LATEST MODELS ONLY ---
+    // Inme se koi bhi error nahi dega v1beta par
     const models = [
         "gemini-1.5-flash",
-        "gemini-1.5-pro",
-        "gemini-pro"
+        "gemini-1.5-pro"
     ];
 
     let lastError = "";
 
-    // Loop chalayenge har model ko test karne ke liye
     for (const model of models) {
         try {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
@@ -31,19 +29,13 @@ module.exports = async function handler(req, res) {
 
             const data = await response.json();
 
-            // Agar model ne sahi jawab diya
             if (data.candidates && data.candidates[0].content) {
                 const aiText = data.candidates[0].content.parts[0].text;
-                
-                // Response ke saath Unlimited Access (No credit minus)
-                return res.status(200).json({ 
-                    text: aiText,
-                    modelUsed: model // Debugging ke liye dekh sakte hain kaunsa model chala
-                });
+                // Unlimited: Yahan koi credit check nahi hai
+                return res.status(200).json({ text: aiText });
             } else {
-                lastError = data.error ? data.error.message : "Model failed";
-                console.log(`Model ${model} fail ho gaya, agla try kar rahe hain...`);
-                continue; // Agle model par jao
+                lastError = data.error ? data.error.message : "Model error";
+                continue; 
             }
         } catch (err) {
             lastError = err.message;
@@ -51,8 +43,7 @@ module.exports = async function handler(req, res) {
         }
     }
 
-    // Agar saare models fail ho jayein
     return res.status(200).json({ 
-        text: "Maaf kijiyega, abhi saare AI models busy hain. Error: " + lastError 
+        text: "System Update: Purana model band ho gaya hai. Hum naye model se connect kar rahe hain. Error: " + lastError 
     });
 };
