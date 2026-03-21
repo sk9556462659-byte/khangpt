@@ -1,51 +1,45 @@
 const fetch = require("node-fetch");
 
-// 2 second rukne ka function
-const wait = (ms) => new Promise(res => setTimeout(res, ms));
-
 module.exports = async function handler(req, res) {
     if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
     const { prompt } = req.body;
 
-    // 🚀 EXACT NAMES FROM YOUR VERCEL SETTINGS
+    // Vercel se keys uthayega
     const apiKeys = [
         process.env.GEMINI_API_KEY_1,
         process.env.GEMINI_API_KEY_2,
         process.env.GEMINI_API_KEY_3
     ].filter(k => k);
 
-    // Agar Vercel mein keys nahi mili toh ye error dikhayega
+    // Agar Vercel mein keys nahi hain
     if (apiKeys.length === 0) {
-        return res.status(200).json({ text: "System Error: Vercel mein Keys nahi mili. Naam check karein!" });
+        return res.status(200).json({ text: "KhanGPT Error: Vercel mein koi API Key nahi mili!" });
     }
 
     const models = ["gemini-1.5-flash", "gemini-1.5-pro"];
 
-    for (const key of apiKeys) {
+    for (let i = 0; i < apiKeys.length; i++) {
         for (const model of models) {
             try {
-                const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${key}`;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKeys[i]}`;
                 
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: "Aapka naam KhanGPT hai. User: " + (prompt || "Hi") }] }]
+                        contents: [{ parts: [{ text: "Aapka naam KhanGPT hai. User ka sawal: " + (prompt || "Hi") }] }]
                     })
                 });
 
                 const data = await response.json();
 
-                if (data.candidates && data.candidates[0]?.content?.parts) {
-                    // Success! No credits deducted from Firebase.
+                if (data.candidates && data.candidates[0]?.content) {
                     return res.status(200).json({ text: data.candidates[0].content.parts[0].text });
                 }
 
-                if (response.status === 429) {
-                    await wait(2000); 
-                    continue; 
-                }
+                // Agar Google error de raha hai toh humein pata chal jayega
+                console.log(`Key ${i+1} failed: ${data.error?.message || "Unknown error"}`);
 
             } catch (err) {
                 continue;
@@ -54,6 +48,6 @@ module.exports = async function handler(req, res) {
     }
 
     return res.status(200).json({ 
-        text: "KhanGPT abhi limit par hai. Kripya 20 seconds baad phir se koshish karein." 
+        text: "Bhai, sabhi " + apiKeys.length + " keys try kar li hain, par Google jawab nahi de raha. Kripya apni API Keys ko AI Studio mein ja kar dobara check karein." 
     });
 };
