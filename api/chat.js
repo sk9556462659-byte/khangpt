@@ -4,32 +4,40 @@ module.exports = async function handler(req, res) {
     if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
     const { prompt } = req.body;
-    const key = process.env.GEMINI_API_KEY_1; // Vercel se key uthayega
+    
+    // Vercel dashboard se keys
+    const apiKeys = [
+        process.env.GEMINI_API_KEY_1,
+        process.env.GEMINI_API_KEY_2,
+        process.env.GEMINI_API_KEY_3
+    ].filter(k => k);
 
-    try {
-        // 🚀 UPDATED MODEL NAME & ENDPOINT
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${key}`;
-        
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: "Aapka naam KhanGPT hai. User ka sawal: " + (prompt || "Hi") }] }]
-            })
-        });
+    for (const key of apiKeys) {
+        try {
+            // 🚀 STABLE V1 ENDPOINT (Naye models ke bina)
+            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`;
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: "Aapka naam KhanGPT hai. " + (prompt || "Hi") }] }]
+                })
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        if (data.candidates && data.candidates[0]?.content) {
-            return res.status(200).json({ text: data.candidates[0].content.parts[0].text });
-        }
+            if (data.candidates && data.candidates[0]?.content) {
+                return res.status(200).json({ text: data.candidates[0].content.parts[0].text });
+            }
+            
+            // Debugging ke liye agar abhi bhi error aaye
+            console.log("Internal Error:", data.error?.message);
 
-        // Error message for debugging
-        return res.status(200).json({ 
-            text: data.error ? `Google Keh Raha Hai: ${data.error.message}` : "Connection successful but no response." 
-        });
-
-    } catch (err) {
-        return res.status(200).json({ text: "Server Error: " + err.message });
+        } catch (err) { continue; }
     }
+
+    return res.status(200).json({ 
+        text: "KhanGPT Update: Bhai, humne v1 aur v1beta dono try kar liye. Ek baar AI Studio mein ja kar naya project banayein aur uski key use karein." 
+    });
 };
