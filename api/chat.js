@@ -12,26 +12,22 @@ module.exports = async function handler(req, res) {
 
     for (const key of apiKeys) {
         try {
-            // v1 endpoint 1.5-flash ke liye sabse stable hai
+            // gemini-1.5-flash sabse zyada free requests deta hai
             const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`;
-            
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: "Aapka naam KhanGPT hai. " + (prompt || "Hi") }] }]
+                    contents: [{ parts: [{ text: "Aap KhanGPT hain. " + (prompt || "Hi") }] }]
                 })
             });
 
             const data = await response.json();
-
             if (data.candidates && data.candidates[0]?.content) {
                 return res.status(200).json({ text: data.candidates[0].content.parts[0].text });
             }
         } catch (err) { continue; }
     }
 
-    return res.status(200).json({ 
-        text: "Bhai, abhi saari keys busy hain. 1 minute baad try karein." 
-    });
+    return res.status(200).json({ text: "Bhai, saari keys ki limit khatam ho gayi hai. Nayi key add karein." });
 };
