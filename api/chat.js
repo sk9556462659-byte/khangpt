@@ -2,30 +2,46 @@ const fetch = require("node-fetch");
 
 module.exports = async function handler(req, res) {
     const { prompt } = req.body;
-    const key = process.env.GEMINI_API_KEY_1; // Sirf pehli key use karein
+
+    const key = process.env.GEMINI_API_KEY_1;
 
     try {
-        // v1 endpoint aur stable 1.5 model use kar rahe hain
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`;
-        
+        // ✅ CORRECT API + MODEL
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${key}`;
+
         const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt || "Hi" }] }]
+                contents: [
+                    {
+                        parts: [
+                            { text: prompt || "Hi" }
+                        ]
+                    }
+                ]
             })
         });
 
         const data = await response.json();
 
+        // ✅ SUCCESS RESPONSE
         if (data.candidates && data.candidates[0]?.content) {
-            return res.status(200).json({ text: data.candidates[0].content.parts[0].text });
+            return res.status(200).json({
+                text: data.candidates[0].content.parts[0].text
+            });
         }
 
-        // Agar error aaye toh humein EXACT Google ka error dikhao
-        return res.status(200).json({ text: "Google Error: " + (data.error?.message || "Check Keys") });
+        // ❌ ERROR SHOW (clear message)
+        return res.status(200).json({
+            text: "Google Error: " + (data.error?.message || "Unknown error")
+        });
 
     } catch (err) {
-        return res.status(200).json({ text: "System Error: " + err.message });
+        return res.status(200).json({
+            text: "System Error: " + err.message
+        });
     }
 };
