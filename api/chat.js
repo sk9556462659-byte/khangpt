@@ -6,33 +6,53 @@ module.exports = async function handler(req, res) {
     const { prompt } = req.body;
     const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
-    try {
-        // --- 🚀 NEW STABLE URL ---
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+    // --- 🚀 MODELS KI LIST (Priority wise) ---
+    // Sabse pehle Flash try hoga (Fast), phir Pro (Smart)
+    const models = [
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-pro"
+    ];
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ 
-                    role: "user", 
-                    parts: [{ text: "Aapka naam KhanGPT hai. Helpful aur tameezdaar rahein. User: " + (prompt || "Hi") }] 
-                }]
-            })
-        });
+    let lastError = "";
 
-        const data = await response.json();
+    // Loop chalayenge har model ko test karne ke liye
+    for (const model of models) {
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
 
-        if (data.candidates && data.candidates[0].content) {
-            const aiText = data.candidates[0].content.parts[0].text;
-            // Unlimited: Hum yahan Firebase mein credit minus nahi kar rahe
-            return res.status(200).json({ text: aiText });
-        } else {
-            // Agar API key mein masla ho toh ye message dikhega
-            return res.status(200).json({ text: "AI Response Error: " + (data.error ? data.error.message : "Check API Key in Vercel") });
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: "Aapka naam KhanGPT hai. User: " + (prompt || "Hi") }] }]
+                })
+            });
+
+            const data = await response.json();
+
+            // Agar model ne sahi jawab diya
+            if (data.candidates && data.candidates[0].content) {
+                const aiText = data.candidates[0].content.parts[0].text;
+                
+                // Response ke saath Unlimited Access (No credit minus)
+                return res.status(200).json({ 
+                    text: aiText,
+                    modelUsed: model // Debugging ke liye dekh sakte hain kaunsa model chala
+                });
+            } else {
+                lastError = data.error ? data.error.message : "Model failed";
+                console.log(`Model ${model} fail ho gaya, agla try kar rahe hain...`);
+                continue; // Agle model par jao
+            }
+        } catch (err) {
+            lastError = err.message;
+            continue;
         }
-
-    } catch (error) {
-        return res.status(500).json({ error: "Server Error: " + error.message });
     }
+
+    // Agar saare models fail ho jayein
+    return res.status(200).json({ 
+        text: "Maaf kijiyega, abhi saare AI models busy hain. Error: " + lastError 
+    });
 };
