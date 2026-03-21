@@ -6,45 +6,32 @@ module.exports = async function handler(req, res) {
     const { prompt } = req.body;
     const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
-    // --- 1. System Prompt (AI ko tameez sikhane ke liye) ---
-    const systemInstruction = "Aapka naam KhanGPT hai. Aap ek tameezdaar aur helpful AI hain. Agar koi user gandi baat, gaali, ya galat kaam (jaise hacking) ki baat kare, toh usse sakhti se mana kar dein aur kahein ki 'Main aise sawalon ka jawab nahi de sakta'. Sirf kaam ki baaton ka jawab dein.";
-
     try {
+        // Naya Stable URL
         const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
 
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [
-                    { role: "user", parts: [{ text: systemInstruction + "\n\nUser ka sawal: " + prompt }] }
-                ],
-                // --- 2. Safety Settings (Google ka internal filter) ---
-                safetySettings: [
-                    { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-                    { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-                    { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
-                    { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" }
-                ]
+                contents: [{ 
+                    role: "user", 
+                    parts: [{ text: "Aapka naam KhanGPT hai. Helpful rahein aur tameez se jawab dein.\n\nUser: " + prompt }] 
+                }]
             })
         });
 
         const data = await response.json();
 
-        // Agar Google ne block kiya toh tameez wala message dikhayenge
-        if (data.promptFeedback && data.promptFeedback.blockReason) {
-            return res.status(200).json({ text: "Maaf kijiyega, aapka sawal hamari safety policy ke khilaf hai. Kripya sahi tarike se baat karein." });
-        }
-
+        // Agar response mil gaya toh seedha dikhao (Koi credit check nahi)
         if (data.candidates && data.candidates[0].content) {
             const aiText = data.candidates[0].content.parts[0].text;
             return res.status(200).json({ text: aiText });
         } else {
-            // Agar koi aur masla ho
-            return res.status(200).json({ text: "Main is sawal ka jawab nahi de sakta. Kuch aur poochiye." });
+            return res.status(200).json({ text: "Maaf kijiyega, main abhi jawab nahi de sakta." });
         }
 
     } catch (error) {
-        return res.status(500).json({ error: "Server error occurred." });
+        return res.status(500).json({ error: "Server Error" });
     }
 };
