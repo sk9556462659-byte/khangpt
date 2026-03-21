@@ -4,45 +4,62 @@ module.exports = async function handler(req, res) {
     if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
     const { prompt } = req.body;
-    const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
-    // --- 🚀 STABLE MODELS ONLY ---
-    // Flash sabse fast hai aur v1 par chalta hai
-    const models = [
-        "gemini-1.5-flash",
-        "gemini-1.5-pro"
-    ];
+    // 🚀 MULTIPLE KEYS ROTATION
+    const apiKeys = [
+        process.env.GEMINI_KEY_1,
+        process.env.GEMINI_KEY_2,
+        process.env.GEMINI_KEY_3
+    ].filter(k => k); // Khali keys ko hata dega
 
-    for (const model of models) {
-        try {
-            // Google ka sabse stable v1 endpoint use kar rahe hain
-            const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${GEMINI_KEY}`;
+    const models = ["gemini-1.5-flash", "gemini-1.5-pro"];
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: "Aapka naam KhanGPT hai. User: " + (prompt || "Hi") }] }]
-                })
-            });
+    // Har Key ko baari-baari try karega
+    for (const key of apiKeys) {
+        for (const model of models) {
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${key}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ 
+                            parts: [{ text: "Aapka naam KhanGPT hai. User: " + (prompt || "Hi") }] 
+                        }],
+                        safetySettings: [
+                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+                        ]
+                    })
+                });
 
-            const data = await response.json();
+                const data = await response.json();
 
-            // Agar model ne sahi jawab diya toh seedha return karein
-            if (data.candidates && data.candidates[0].content) {
-                const aiText = data.candidates[0].content.parts[0].text;
-                // Yahan koi credit minus nahi ho raha = UNLIMITED 🚀
-                return res.status(200).json({ text: aiText });
+                // Agar response mil gaya toh seedha bhej do
+                if (data.candidates && data.candidates[0]?.content?.parts) {
+                    return res.status(200).json({ 
+                        text: data.candidates[0].content.parts[0].text 
+                    });
+                }
+
+                // Agar 429 (Rate Limit) hai toh agali key par jao
+                if (response.status === 429) {
+                    console.log(`Key limit hit for ${model}, switching...`);
+                    continue; 
+                }
+
+            } catch (err) {
+                console.error("Error in loop:", err.message);
+                continue;
             }
-            
-            console.log(`Model ${model} fail hua, agla check kar rahe hain...`);
-        } catch (err) {
-            continue; // Agle model par jao
         }
     }
 
-    // Agar sab fail ho jayein toh user-friendly message
+    // Agar sab kuch fail ho jaye
     return res.status(200).json({ 
-        text: "KhanGPT abhi busy hai ya API key ki limit khatam ho gayi hai. Kripya 1 minute baad koshish karein." 
+        text: "Bhai, KhanGPT abhi bohot zyada busy hai. Saari API keys ki limit hit ho gayi hai. 1 minute baad try karein." 
     });
 };
