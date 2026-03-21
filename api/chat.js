@@ -6,18 +6,17 @@ module.exports = async function handler(req, res) {
     const { prompt } = req.body;
     const GEMINI_KEY = process.env.GEMINI_API_KEY;
 
-    // --- 🚀 LATEST MODELS ONLY ---
-    // Inme se koi bhi error nahi dega v1beta par
+    // --- 🚀 STABLE MODELS ONLY ---
+    // Flash sabse fast hai aur v1 par chalta hai
     const models = [
         "gemini-1.5-flash",
         "gemini-1.5-pro"
     ];
 
-    let lastError = "";
-
     for (const model of models) {
         try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
+            // Google ka sabse stable v1 endpoint use kar rahe hain
+            const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${GEMINI_KEY}`;
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -29,21 +28,21 @@ module.exports = async function handler(req, res) {
 
             const data = await response.json();
 
+            // Agar model ne sahi jawab diya toh seedha return karein
             if (data.candidates && data.candidates[0].content) {
                 const aiText = data.candidates[0].content.parts[0].text;
-                // Unlimited: Yahan koi credit check nahi hai
+                // Yahan koi credit minus nahi ho raha = UNLIMITED 🚀
                 return res.status(200).json({ text: aiText });
-            } else {
-                lastError = data.error ? data.error.message : "Model error";
-                continue; 
             }
+            
+            console.log(`Model ${model} fail hua, agla check kar rahe hain...`);
         } catch (err) {
-            lastError = err.message;
-            continue;
+            continue; // Agle model par jao
         }
     }
 
+    // Agar sab fail ho jayein toh user-friendly message
     return res.status(200).json({ 
-        text: "System Update: Purana model band ho gaya hai. Hum naye model se connect kar rahe hain. Error: " + lastError 
+        text: "KhanGPT abhi busy hai ya API key ki limit khatam ho gayi hai. Kripya 1 minute baad koshish karein." 
     });
 };
