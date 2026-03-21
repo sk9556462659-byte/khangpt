@@ -2,12 +2,10 @@ const fetch = require("node-fetch");
 
 module.exports = async function handler(req, res) {
     const { prompt } = req.body;
-
     const key = process.env.GEMINI_API_KEY_1;
 
     try {
-        // ✅ CORRECT API + MODEL
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${key}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
 
         const response = await fetch(url, {
             method: "POST",
@@ -17,9 +15,7 @@ module.exports = async function handler(req, res) {
             body: JSON.stringify({
                 contents: [
                     {
-                        parts: [
-                            { text: prompt || "Hi" }
-                        ]
+                        parts: [{ text: prompt || "Hi" }]
                     }
                 ]
             })
@@ -27,14 +23,12 @@ module.exports = async function handler(req, res) {
 
         const data = await response.json();
 
-        // ✅ SUCCESS RESPONSE
         if (data.candidates && data.candidates[0]?.content) {
             return res.status(200).json({
                 text: data.candidates[0].content.parts[0].text
             });
         }
 
-        // ❌ ERROR SHOW (clear message)
         return res.status(200).json({
             text: "Google Error: " + (data.error?.message || "Unknown error")
         });
