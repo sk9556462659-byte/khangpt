@@ -1,3 +1,6 @@
+/* ================================
+   GLOBAL RESET
+================================ */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -5,15 +8,19 @@
     font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
 }
 
+/* ================================
+   THEME (GLOBAL SYSTEM)
+================================ */
 :root {
     --bg: #f8f9fa;
     --text: #1a1a1b;
     --card: #ffffff;
-    --accent: #6366f1; /* Modern Blueish-Purple */
+    --accent: #6366f1;
     --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
-    --border: rgba(0,0,0,0.05);
+    --border: rgba(0,0,0,0.08);
 }
 
+/* Dark Mode */
 body.dark {
     --bg: #0a0a0f;
     --text: #ffffff;
@@ -22,6 +29,17 @@ body.dark {
     --border: rgba(255,255,255,0.1);
 }
 
+/* Improve browser UI */
+html {
+    color-scheme: light;
+}
+body.dark {
+    color-scheme: dark;
+}
+
+/* ================================
+   BASE
+================================ */
 body {
     background: var(--bg);
     color: var(--text);
@@ -29,6 +47,9 @@ body {
     min-height: 100vh;
 }
 
+/* ================================
+   HEADER
+================================ */
 header {
     display: flex;
     justify-content: space-between;
@@ -48,21 +69,24 @@ header {
     background: var(--accent-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    letter-spacing: -0.5px;
 }
 
+/* ================================
+   MAIN CONTAINER
+================================ */
 .container {
     padding: 20px 15px 140px;
     max-width: 800px;
     margin: 0 auto;
 }
 
-/* Chat Styling */
+/* ================================
+   CHAT
+================================ */
 #chat-display {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    margin-bottom: 20px;
 }
 
 .message {
@@ -72,6 +96,7 @@ header {
     line-height: 1.5;
     font-size: 15px;
     animation: fadeIn 0.3s ease;
+    word-wrap: break-word;
 }
 
 .user-msg {
@@ -84,20 +109,23 @@ header {
 .ai-msg {
     align-self: flex-start;
     background: var(--card);
-    color: var(--text);
     border: 1px solid var(--border);
     border-bottom-left-radius: 4px;
 }
 
-/* Image Result */
+/* ================================
+   IMAGE
+================================ */
 #result img {
     width: 100%;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     margin-top: 15px;
 }
 
-/* Input Bar */
+/* ================================
+   INPUT BAR
+================================ */
 .bottom-bar {
     position: fixed;
     bottom: 0;
@@ -122,6 +150,10 @@ header {
     font-size: 16px;
 }
 
+.bottom-bar input:focus {
+    border-color: var(--accent);
+}
+
 .bottom-bar button {
     background: var(--accent-gradient);
     border: none;
@@ -134,14 +166,36 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s;
+    transition: transform 0.2s ease;
+}
+
+.bottom-bar button:hover {
+    transform: scale(1.05);
 }
 
 .bottom-bar button:active {
     transform: scale(0.9);
 }
 
+/* ================================
+   ANIMATION
+================================ */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================================
+   MOBILE
+================================ */
+@media (max-width: 600px) {
+    .message {
+        max-width: 90%;
+    }
 }
